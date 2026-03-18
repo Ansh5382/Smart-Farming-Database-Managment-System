@@ -17,7 +17,18 @@ public class Crop {
     @Column(name = "variety")
     private String variety;
 
+    @Column(name = "farmerNIC")
+    private String farmerNIC;
+
     public Crop() {
+    }
+
+    public String getFarmerNIC() {
+        return farmerNIC;
+    }
+
+    public void setFarmerNIC(String farmerNIC) {
+        this.farmerNIC = farmerNIC;
     }
 
     public int getCropId() {

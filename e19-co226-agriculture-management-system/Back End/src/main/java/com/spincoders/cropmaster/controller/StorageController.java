@@ -26,4 +26,9 @@ public class StorageController {
         return storageService.getAllStorage();
     }
 
+    @GetMapping("/byFarmer/{farmerNIC}")
+    public List<Storage> getByFarmer(@PathVariable String farmerNIC) {
+        return storageService.getStorageByFarmer(farmerNIC);
+    }
+
 }

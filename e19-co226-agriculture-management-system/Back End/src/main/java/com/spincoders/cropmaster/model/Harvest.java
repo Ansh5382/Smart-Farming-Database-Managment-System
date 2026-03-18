@@ -19,7 +19,18 @@ public class Harvest {
     @Column(name = "cost")
     private String cost;
 
+    @Column(name = "farmerNIC")
+    private String farmerNIC;
+
     public Harvest() {
+    }
+
+    public String getFarmerNIC() {
+        return farmerNIC;
+    }
+
+    public void setFarmerNIC(String farmerNIC) {
+        this.farmerNIC = farmerNIC;
     }
 
     public int getMethodID() {

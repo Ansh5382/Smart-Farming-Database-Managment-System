@@ -1,15 +1,11 @@
 // Home.jsx
 import React from 'react';
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import AppHeader from "../components/owner/AppHeader.jsx";
 import SideNav from "../components/owner/SideNav.jsx";
-import {BrowserRouter, Outlet, useNavigation} from "react-router-dom";
-import SideNavOwner from "../components/owner/SideNav.jsx";
-import AppRoutes from "../router/AppRoutes.jsx";
+import { Outlet } from "react-router-dom";
 
 const OwnerLayout = () => {
-
-
 
     return (
         <>

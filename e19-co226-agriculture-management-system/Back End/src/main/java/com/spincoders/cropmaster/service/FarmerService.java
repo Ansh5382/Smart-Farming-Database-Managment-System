@@ -15,4 +15,12 @@ public interface FarmerService {
     public ResponseEntity<String> authenticateFarmer(String nic, String password);
 
     public Farmer findByNic(String nic);
+
+    public java.util.List<Farmer> getFarmersByOwner(String ownerNIC);
+
+    public ResponseEntity<String> deleteFarmer(String nic, String password);
+
+    public ResponseEntity<String> changePassword(String nic, String currentPassword, String newPassword);
+
+    public ResponseEntity<Farmer> updateProfile(String nic, Farmer updatedFields);
 }

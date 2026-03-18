@@ -25,6 +25,11 @@ public class CropImplementaion implements CropService {
     }
 
     @Override
+    public List<Crop> getCropsByFarmer(String farmerNIC) {
+        return cropRepositary.findByFarmerNIC(farmerNIC);
+    }
+
+    @Override
     public Optional<Crop> getCropByID(int cropID) {
         return cropRepositary.findById(cropID);
     }

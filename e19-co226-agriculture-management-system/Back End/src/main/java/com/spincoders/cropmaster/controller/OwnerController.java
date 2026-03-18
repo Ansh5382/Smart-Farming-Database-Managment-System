@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/owner")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 public class OwnerController {
 
     @Autowired
@@ -43,6 +43,26 @@ public class OwnerController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(@RequestBody Map<String, String> deleteData) {
+        String nic = deleteData.get("nic");
+        String password = deleteData.get("password");
+        return ownerService.deleteOwner(nic, password);
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> data) {
+        String nic = data.get("nic");
+        String currentPassword = data.get("currentPassword");
+        String newPassword = data.get("newPassword");
+        return ownerService.changePassword(nic, currentPassword, newPassword);
+    }
+
+    @PutMapping("/updateProfile/{nic}")
+    public ResponseEntity<Owner> updateProfile(@PathVariable String nic, @RequestBody Owner updatedFields) {
+        return ownerService.updateProfile(nic, updatedFields);
     }
 
 }

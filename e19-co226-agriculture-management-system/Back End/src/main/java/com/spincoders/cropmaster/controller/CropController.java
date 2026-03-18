@@ -27,6 +27,11 @@ public class CropController {
         return cropService.getAllCrop();
     }
 
+    @GetMapping("/byFarmer/{farmerNIC}")
+    public List<Crop> getByFarmer(@PathVariable String farmerNIC) {
+        return cropService.getCropsByFarmer(farmerNIC);
+    }
+
     @GetMapping("/getbyID/{cropID}")
     public Optional<Crop> getCropById(@PathVariable int cropID){
         return cropService.getCropByID(cropID);

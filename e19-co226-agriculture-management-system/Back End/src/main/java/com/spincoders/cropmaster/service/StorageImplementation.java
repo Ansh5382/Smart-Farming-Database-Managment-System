@@ -23,4 +23,9 @@ public class StorageImplementation implements StorageService{
     public List<Storage> getAllStorage() {
         return storageRepositary.findAll();
     }
+
+    @Override
+    public List<Storage> getStorageByFarmer(String farmerNIC) {
+        return storageRepositary.findByFarmerNIC(farmerNIC);
+    }
 }

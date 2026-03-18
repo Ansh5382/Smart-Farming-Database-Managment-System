@@ -4,6 +4,7 @@ import {
     FormControl, InputLabel, Select, MenuItem, Divider, Box,
     Stack, IconButton, CircularProgress, Snackbar, Alert, InputAdornment
 } from '@mui/material';
+import { motion } from 'framer-motion';
 
 // Fixed Icon Imports
 import ChevronLeft from '@mui/icons-material/ChevronLeft';
@@ -15,10 +16,21 @@ import LocalShipping from '@mui/icons-material/LocalShipping';
 import { useNic } from "../../components/NicContext.jsx";
 
 // --- CropMaster Theme Palette ---
-const BG_CREME = '#FDFCF8';        
-const SAGE_DARK = '#2C3E35';       
-const BORDER_COLOR = '#E5E2D9';    
+const BG_CREME = '#fffdf2';        
+const SAGE_DARK = '#2f3e46';       
+const BORDER_COLOR = '#cad2c5';    
 const STEEL_BLUE = '#4682B4'; // Accent color for machinery
+
+// --- Animations ---
+const containerParams = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemParams = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
 
 const inputStyle = {
     '& .MuiOutlinedInput-root': {
@@ -49,9 +61,15 @@ const AddMachine = () => {
 
     const fetchData = async () => {
         try {
+            // First get farmer's owner context
+            const resProfile = await fetch(`http://localhost:8080/farmer/${nic}`);
+            if (!resProfile.ok) throw new Error("Could not fetch profile");
+            const profile = await resProfile.json();
+            const ownerNIC = profile.ownerNIC;
+
             const [resFarm, resMach] = await Promise.all([
-                fetch(`http://localhost:8080/farmland/getAll/${nic}`),
-                fetch('http://localhost:8080/machinery/getAll')
+                fetch(`http://localhost:8080/farmland/getAll/${nic}/${ownerNIC}`),
+                fetch(`http://localhost:8080/machinery/byFarmer/${nic}`)
             ]);
             if (resFarm.ok) setFarmlandData(await resFarm.json());
             if (resMach.ok) setMachineryData(await resMach.json());
@@ -80,7 +98,7 @@ const AddMachine = () => {
             const res = await fetch('http://localhost:8080/machinery/addNew', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(machineData),
+                body: JSON.stringify({ ...machineData, farmerNIC: nic }),
             });
             if (res.ok) {
                 showNotify('Asset successfully added to fleet', 'success');
@@ -117,10 +135,10 @@ const AddMachine = () => {
     };
 
     return (
-        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK }}>
+        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK, overflowX: 'hidden' }}>
             
             {/* Header Navigation */}
-            <Box sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
+            <Box component={motion.div} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <IconButton size="small" sx={{ border: `1px solid ${BORDER_COLOR}` }} onClick={() => window.history.back()}>
                         <ChevronLeft />
@@ -134,11 +152,11 @@ const AddMachine = () => {
                 </Typography>
             </Box>
 
-            <Container maxWidth="lg" sx={{ mt: 6 }}>
+            <Container maxWidth="lg" sx={{ mt: 6 }} component={motion.div} variants={containerParams} initial="hidden" animate="show">
                 <Grid container spacing={4}>
                     
                     {/* Registry Section */}
-                    <Grid item xs={12} md={7}>
+                    <Grid item xs={12} md={7} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
                                 <PrecisionManufacturing sx={{ color: SAGE_DARK }} />
@@ -174,7 +192,7 @@ const AddMachine = () => {
                                         disabled={loading}
                                         fullWidth
                                         startIcon={<Construction />}
-                                        sx={{ bgcolor: SAGE_DARK, color: '#fff', py: 2, borderRadius: '12px', fontWeight: 700, mt: 1, '&:hover': { bgcolor: '#1a2621' }, boxShadow: 'none' }}
+                                        sx={{ bgcolor: SAGE_DARK, color: '#fff', py: 2, borderRadius: '12px', fontWeight: 700, mt: 1, '&:hover': { bgcolor: '#1e293b' }, boxShadow: 'none' }}
                                     >
                                         {loading ? <CircularProgress size={24} color="inherit" /> : "Register Asset"}
                                     </Button>
@@ -184,7 +202,7 @@ const AddMachine = () => {
                     </Grid>
 
                     {/* Deployment Section */}
-                    <Grid item xs={12} md={5}>
+                    <Grid item xs={12} md={5} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
                                 <LocalShipping sx={{ color: STEEL_BLUE }} />
@@ -193,7 +211,7 @@ const AddMachine = () => {
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>Log which machine is currently active in which field.</Typography>
                         </Box>
 
-                        <Paper elevation={0} sx={{ p: 4, borderRadius: '24px', border: `1px solid ${BORDER_COLOR}`, bgcolor: '#F4F7F5' }}>
+                        <Paper elevation={0} sx={{ p: 4, borderRadius: '24px', border: `1px solid ${BORDER_COLOR}`, bgcolor: '#fdfcf0' }}>
                             <Stack spacing={3}>
                                 <FormControl fullWidth sx={inputStyle}>
                                     <InputLabel>Target Farmland</InputLabel>

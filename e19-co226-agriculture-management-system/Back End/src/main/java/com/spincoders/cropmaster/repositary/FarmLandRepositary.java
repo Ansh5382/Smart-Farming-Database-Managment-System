@@ -11,20 +11,25 @@ import java.util.List;
 @Repository
 public interface FarmLandRepositary extends JpaRepository<Farmland, Integer> {
 
-    @Query("SELECT u FROM Farmland u WHERE u.nic = :nic and u.cropID != 0 ")
-    List<Farmland> findCropLand(@Param("nic") String nic);
+    @Query("SELECT u FROM Farmland u WHERE u.nic = :nic AND u.ownerNIC = :ownerNIC AND u.cropID != 0 ")
+    List<Farmland> findCropLand(@Param("nic") String nic, @Param("ownerNIC") String ownerNIC);
 
-    @Query("SELECT u FROM Farmland u WHERE u.nic = :nic and u.cropID = 0 ")
-    List<Farmland> findUncropLand(@Param("nic") String nic);
+    @Query("SELECT u FROM Farmland u WHERE u.nic = :nic AND u.ownerNIC = :ownerNIC AND u.cropID = 0 ")
+    List<Farmland> findUncropLand(@Param("nic") String nic, @Param("ownerNIC") String ownerNIC);
 
-    @Query("SELECT u FROM Farmland u WHERE u.nic = :nic")
-    List<Farmland> findFarmlandByFarmer(@Param("nic") String nic);
+    @Query("SELECT u FROM Farmland u WHERE u.nic = :nic AND u.ownerNIC = :ownerNIC")
+    List<Farmland> findFarmlandByFarmer(@Param("nic") String nic, @Param("ownerNIC") String ownerNIC);
 
-    @Query("SELECT u FROM Farmland u WHERE u.nic = ''")
-    List<Farmland> findFarmlandNoNic();
+    @Query("SELECT f FROM Farmland f WHERE f.ownerNIC = :ownerNIC")
+    List<Farmland> findByOwnerNIC(@Param("ownerNIC") String ownerNIC);
 
-    @Query("SELECT u FROM Farmland u WHERE u.nic is not null ")
-    List<Farmland> findFarmlandNic();
+    @Query("SELECT u FROM Farmland u WHERE u.ownerNIC = :ownerNIC AND (u.nic IS NULL OR u.nic = '')")
+    List<Farmland> findFarmlandNoNicByOwner(@Param("ownerNIC") String ownerNIC);
 
+    @Query("SELECT u FROM Farmland u WHERE u.ownerNIC = :ownerNIC AND (u.nic IS NOT NULL AND u.nic != '')")
+    List<Farmland> findFarmlandNicByOwner(@Param("ownerNIC") String ownerNIC);
 
+    void deleteByOwnerNIC(String ownerNIC);
+
+    List<Farmland> findByNic(String nic);
 }

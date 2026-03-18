@@ -23,4 +23,9 @@ public class ChemicalImplementation implements ChemicalService {
     public List<Chemical> getAllChemical() {
         return chemicalRepositary.findAll();
     }
+
+    @Override
+    public List<Chemical> getChemicalByFarmer(String farmerNIC) {
+        return chemicalRepositary.findByFarmerNIC(farmerNIC);
+    }
 }

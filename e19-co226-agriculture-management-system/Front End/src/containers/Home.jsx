@@ -12,9 +12,10 @@ import {
     Avatar,
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
-import backgroundImage from '../assets/background/background.jpg';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useNic } from "../components/NicContext.jsx";
+import backgroundImage from '../assets/background/background.jpg';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
@@ -101,19 +102,33 @@ const Home = () => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                backdropFilter: 'blur(3px)'
             }
         }}>
-            <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
+            <Container 
+                maxWidth="sm" 
+                sx={{ position: 'relative', zIndex: 1 }}
+                component={motion.div}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+            >
                 
                 {/* Logo and Title */}
-                <Box sx={{ textAlign: 'center', mb: 4 }}>
+                <Box 
+                    sx={{ textAlign: 'center', mb: 4 }}
+                    component={motion.div}
+                    initial={{ scale: 0.6, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 100, damping: 12 }}
+                >
                     <Avatar
                         sx={{
                             width: 80,
                             height: 80,
                             margin: '0 auto 16px',
-                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            background: 'linear-gradient(135deg, #52796f 0%, #354f52 100%)',
                             boxShadow: '0 8px 24px rgba(16, 185, 129, 0.4)',
                         }}
                     >
@@ -135,9 +150,10 @@ const Home = () => {
                     <Typography 
                         variant="subtitle1" 
                         sx={{ 
-                            color: 'white',
+                            color: '#e2e8f0',
                             fontWeight: 600,
                             textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
+                            letterSpacing: '0.5px'
                         }}
                     >
                         Smart Agriculture Management
@@ -147,8 +163,13 @@ const Home = () => {
                 {/* Login Card */}
                 <Paper 
                     elevation={8}
+                    component={motion.div}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
                     sx={{
-                        background: 'white',
+                        background: 'rgba(255, 255, 255, 0.95)',
+                        backdropFilter: 'blur(20px)',
                         borderRadius: '20px',
                         padding: '40px',
                         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
@@ -190,15 +211,15 @@ const Home = () => {
                                 textTransform: 'none',
                                 borderRadius: '10px',
                                 ...(userType === 'farmer' ? {
-                                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                    background: 'linear-gradient(135deg, #52796f 0%, #354f52 100%)',
                                     color: 'white',
                                     boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
                                     '&:hover': {
-                                        background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                                        background: 'linear-gradient(135deg, #52796f 0%, #354f52 100%)',
                                     }
                                 } : {
-                                    color: '#10b981',
-                                    borderColor: '#10b981',
+                                    color: '#52796f',
+                                    borderColor: '#52796f',
                                     borderWidth: '2px',
                                     '&:hover': {
                                         backgroundColor: 'rgba(16, 185, 129, 0.05)',
@@ -247,6 +268,7 @@ const Home = () => {
                         label="National Identity Card (NIC)"
                         fullWidth
                         margin="normal"
+                        autoComplete="off"
                         value={nicValue}
                         onChange={(e) => setNicValue(e.target.value)}
                         sx={{
@@ -258,17 +280,18 @@ const Home = () => {
                                     borderWidth: '2px',
                                 },
                                 '&:hover fieldset': {
-                                    borderColor: '#10b981',
+                                    borderColor: '#52796f',
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: '#10b981',
+                                    borderColor: '#52796f',
                                 },
                             },
                         }}
+                        inputProps={{ autoComplete: 'nope' }}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <PersonIcon sx={{ color: '#10b981' }} />
+                                    <PersonIcon sx={{ color: '#52796f' }} />
                                 </InputAdornment>
                             ),
                         }}
@@ -279,9 +302,11 @@ const Home = () => {
                         label="Password"
                         fullWidth
                         margin="normal"
+                        autoComplete="new-password"
                         type={showPassword ? 'text' : 'password'}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        inputProps={{ autoComplete: 'new-password' }}
                         sx={{
                             mb: 3,
                             '& .MuiOutlinedInput-root': {
@@ -291,10 +316,10 @@ const Home = () => {
                                     borderWidth: '2px',
                                 },
                                 '&:hover fieldset': {
-                                    borderColor: '#10b981',
+                                    borderColor: '#52796f',
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: '#10b981',
+                                    borderColor: '#52796f',
                                 },
                             },
                         }}
@@ -325,7 +350,7 @@ const Home = () => {
                         fullWidth
                         endIcon={<LoginIcon />}
                         sx={{
-                            background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%)',
+                            background: 'linear-gradient(135deg, #52796f 0%, #84a98c 50%, #cad2c5 100%)',
                             color: 'white',
                             padding: '14px',
                             fontSize: '16px',
@@ -334,7 +359,7 @@ const Home = () => {
                             textTransform: 'none',
                             boxShadow: '0 8px 20px rgba(59, 130, 246, 0.3)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #059669 0%, #2563eb 50%, #7c3aed 100%)',
+                                background: 'linear-gradient(135deg, #52796f 0%, #84a98c 50%, #cad2c5 100%)',
                                 boxShadow: '0 12px 28px rgba(59, 130, 246, 0.4)',
                             },
                         }}
@@ -365,14 +390,14 @@ const Home = () => {
                             onClick={() => navigate("/signupfarmer")}
                             fullWidth
                             sx={{
-                                background: '#10b981',
+                                background: '#52796f',
                                 color: 'white',
                                 fontWeight: 600,
                                 padding: '10px',
                                 textTransform: 'none',
                                 borderRadius: '10px',
                                 '&:hover': {
-                                    background: '#059669',
+                                    background: '#354f52',
                                 },
                             }}
                         >
@@ -384,14 +409,14 @@ const Home = () => {
                             onClick={() => navigate("/signupowner")}
                             fullWidth
                             sx={{
-                                background: '#3b82f6',
+                                background: '#84a98c',
                                 color: 'white',
                                 fontWeight: 600,
                                 padding: '10px',
                                 textTransform: 'none',
                                 borderRadius: '10px',
                                 '&:hover': {
-                                    background: '#2563eb',
+                                    background: '#52796f',
                                 },
                             }}
                         >

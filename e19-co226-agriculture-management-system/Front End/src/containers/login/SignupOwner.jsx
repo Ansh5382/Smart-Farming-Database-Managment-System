@@ -74,7 +74,7 @@ const SignupOwner = () => {
         maxWidth: '600px',
         width: '100%',
         border: '3px solid',
-        borderImage: 'linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6) 1',
+        borderImage: 'linear-gradient(135deg, #52796f, #84a98c, #cad2c5) 1',
         position: 'relative',
         zIndex: 1,
     };
@@ -84,10 +84,10 @@ const SignupOwner = () => {
             backgroundColor: '#ffffff',
             borderRadius: '12px',
             '&:hover fieldset': {
-                borderColor: '#10b981',
+                borderColor: '#52796f',
             },
             '&.Mui-focused fieldset': {
-                borderColor: '#10b981',
+                borderColor: '#52796f',
                 borderWidth: '2px',
             },
             '& fieldset': {
@@ -99,13 +99,13 @@ const SignupOwner = () => {
             color: '#64748b',
             fontWeight: 600,
             '&.Mui-focused': {
-                color: '#10b981',
+                color: '#52796f',
             },
         },
     };
 
     const buttonStyle = {
-        background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%)',
+        background: 'linear-gradient(135deg, #52796f 0%, #84a98c 50%, #cad2c5 100%)',
         color: 'white',
         padding: '16px 32px',
         fontSize: '16px',
@@ -116,7 +116,7 @@ const SignupOwner = () => {
         boxShadow: '0 10px 25px rgba(59, 130, 246, 0.4)',
         transition: 'all 0.3s ease',
         '&:hover': {
-            background: 'linear-gradient(135deg, #059669 0%, #2563eb 50%, #7c3aed 100%)',
+            background: 'linear-gradient(135deg, #52796f 0%, #84a98c 50%, #cad2c5 100%)',
             boxShadow: '0 15px 35px rgba(59, 130, 246, 0.5)',
             transform: 'translateY(-2px)',
         },
@@ -189,14 +189,14 @@ VALUES ('${nic}', '${password}', '${name}', '${mobile || 'NULL'}', ${age || 'NUL
                     <BusinessIcon 
                         sx={{ 
                             fontSize: 56, 
-                            color: '#10b981',
+                            color: '#52796f',
                         }} 
                     />
                     <Typography 
                         variant="h3" 
                         sx={{ 
                             fontWeight: 800, 
-                            color: '#1e293b',
+                            color: '#ffffff',
                             letterSpacing: '-0.5px',
                         }}
                     >
@@ -241,7 +241,7 @@ VALUES ('${nic}', '${password}', '${name}', '${mobile || 'NULL'}', ${age || 'NUL
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <BadgeIcon sx={{ color: '#10b981', fontSize: 24 }} />
+                                            <BadgeIcon sx={{ color: '#52796f', fontSize: 24 }} />
                                         </InputAdornment>
                                     ),
                                 }}
@@ -357,15 +357,15 @@ VALUES ('${nic}', '${password}', '${name}', '${mobile || 'NULL'}', ${age || 'NUL
                             onClick={() => setShowSQL(!showSQL)}
                             sx={{
                                 width: '100%',
-                                color: '#10b981',
-                                borderColor: '#10b981',
+                                color: '#52796f',
+                                borderColor: '#52796f',
                                 borderWidth: '2px',
                                 fontWeight: 600,
                                 padding: '12px',
                                 borderRadius: '12px',
                                 textTransform: 'none',
                                 '&:hover': {
-                                    borderColor: '#059669',
+                                    borderColor: '#354f52',
                                     borderWidth: '2px',
                                     backgroundColor: 'rgba(16, 185, 129, 0.05)',
                                 },
@@ -385,7 +385,7 @@ VALUES ('${nic}', '${password}', '${name}', '${mobile || 'NULL'}', ${age || 'NUL
                             <Link 
                                 to="/" 
                                 style={{ 
-                                    color: '#10b981', 
+                                    color: '#52796f', 
                                     textDecoration: 'none',
                                     fontWeight: 700,
                                 }}
@@ -406,7 +406,7 @@ VALUES ('${nic}', '${password}', '${name}', '${mobile || 'NULL'}', ${age || 'NUL
                             background: '#1e293b',
                             padding: '24px',
                             borderRadius: '20px',
-                            border: '2px solid #10b981',
+                            border: '2px solid #52796f',
                             position: 'relative',
                         }}
                     >
@@ -414,7 +414,7 @@ VALUES ('${nic}', '${password}', '${name}', '${mobile || 'NULL'}', ${age || 'NUL
                             <Typography 
                                 variant="h6" 
                                 sx={{ 
-                                    color: '#10b981',
+                                    color: '#52796f',
                                     fontWeight: 700,
                                     fontFamily: 'monospace',
                                     display: 'flex',

@@ -1,6 +1,6 @@
 // Home.jsx
 import React from 'react';
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import AppHeader from "../components/farmer/AppHeader.jsx";
 import SideNav from "../components/farmer/SideNav.jsx";
 import {Outlet} from "react-router-dom";

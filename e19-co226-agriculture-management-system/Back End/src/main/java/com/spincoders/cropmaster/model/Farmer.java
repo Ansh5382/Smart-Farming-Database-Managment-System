@@ -29,7 +29,18 @@ public class Farmer {
     @Column(name = "experince") // Matches your DB typo 'experince'
     private String experince;
 
+    @Column(name = "ownerNIC")
+    private String ownerNIC;
+
     public Farmer() {
+    }
+
+    public String getOwnerNIC() {
+        return ownerNIC;
+    }
+
+    public void setOwnerNIC(String ownerNIC) {
+        this.ownerNIC = ownerNIC;
     }
 
     // Updated Getter and Setter for lowercase 'farmerid'

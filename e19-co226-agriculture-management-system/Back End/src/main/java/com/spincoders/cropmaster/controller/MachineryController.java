@@ -27,4 +27,9 @@ public class MachineryController {
         return machineryService.getAllMachinery();
     }
 
+    @GetMapping("/byFarmer/{farmerNIC}")
+    public List<Machinery> getByFarmer(@PathVariable String farmerNIC) {
+        return machineryService.getMachineryByFarmer(farmerNIC);
+    }
+
 }

@@ -1,0 +1,42 @@
+CropMaster
+
+CropMaster is a full-stack agriculture management system developed to help farmers and landowners manage farmland, crops, and agricultural operations more efficiently.
+
+This project uses:
+- React and Vite for the frontend
+- Spring Boot for the backend
+- MySQL for the database
+
+Main features:
+- Farmer and owner login and registration
+- Farmland management
+- Farmer assignment to land
+- Crop management
+- Disease reporting
+- Machinery and chemical usage tracking
+- Irrigation, storage, and harvest management
+- Soil and weather data updates
+- PDF and CSV report generation
+- Multi-language support
+
+User roles:
+1. Farmer
+   Farmers can manage crops, update field data, report disease, and use farming resources.
+
+2. Owner
+   Owners can add farmlands, manage farmers, assign land, and monitor overall farm activity.
+
+Database:
+The project uses a MySQL database named cropmaster. Main tables include owner, farmer, farmland, crop, disease, irrigation, harvest, storage, chemical, machinery, soil, and weather.
+
+How to run:
+1. Create the MySQL database named cropmaster.
+2. Configure database username and password in Back End/src/main/resources/application.properties.
+3. Run the Spring Boot backend on port 8080.
+4. Run the React frontend on port 5173.
+
+GitHub README:
+Use the README.md file in the project root when uploading this project to GitHub.
+
+Additional documentation:
+Detailed documentation is available in docs/PROJECT_DOCUMENTATION.md.

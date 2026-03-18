@@ -9,4 +9,6 @@ public interface IrrigationService {
     public Irrigation saveIrrigation(Irrigation irrigation);
 
     public List<Irrigation> getAllIrrigation();
+
+    public List<Irrigation> getIrrigationByFarmer(String farmerNIC);
 }

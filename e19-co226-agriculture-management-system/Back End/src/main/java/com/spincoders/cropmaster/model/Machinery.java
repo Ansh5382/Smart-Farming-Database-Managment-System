@@ -26,7 +26,18 @@ public class Machinery {
     @Column(name = "safely")
     private String safely;
 
+    @Column(name = "farmerNIC")
+    private String farmerNIC;
+
     public Machinery() {
+    }
+
+    public String getFarmerNIC() {
+        return farmerNIC;
+    }
+
+    public void setFarmerNIC(String farmerNIC) {
+        this.farmerNIC = farmerNIC;
     }
 
     public int getMachineID() {

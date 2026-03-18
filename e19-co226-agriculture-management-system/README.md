@@ -1,78 +1,185 @@
-# Crop Master - Agriculture Management System
+# CropMaster
 
----
+CropMaster is a full-stack agriculture management system built to help farmers and landowners manage farmland, crops, resources, and daily farming operations in one place. The project combines a React frontend, a Spring Boot backend, and a MySQL database.
 
-# Front End Development
+## Project Overview
 
----
+The system supports two main user roles:
 
-Crop Master is an Agriculture Management System designed to streamline and optimize various farming processes. It offers a user-friendly interface for farmers and landowners to manage their farms, crops, machinery, and more. The system aims to enhance productivity, reduce manual efforts, and provide valuable insights for informed decision-making in the agriculture domain.
+- Farmer
+- Owner
 
----
+Farmers can manage crop-related activities and field operations, while owners can monitor land usage, manage farmers, and track overall farm performance.
 
-## Features
+## Main Features
 
----
-
-1. User Authentication: Secure login and registration for both farmers and landowners.
-2. Farmland Management: View and manage farmlands, including cropping and uncropping.
-3. Crop Management: Add, update, and view details of different crop varieties.
-4. Resource Tracking: Monitor machinery, chemicals, and water usage.
-5. Weather Insights: Access real-time weather data for better planning.
-6. Disease Reporting: Report and track crop diseases for timely interventions.
-7. Task Scheduling: Schedule irrigation, planting, and harvesting tasks.
-8. Data Analytics: Gain insights from data to improve farm operations.
-9. Mobile Responsive: Accessible on various devices for on-the-go management.
-
----
-
-## Usage
-
----
-
-- Register as a farmer or landowner.
-- Log in to your account.
-- Explore and manage your farmlands, crops, and resources.
-- Utilize the system's features to enhance your farming operations.
-
----
-
-# Back End Development
-
----
-
-CropMaster is a web application designed to manage various aspects of crop cultivation and farm management. This repository contains the backend codebase for the CropMaster application.
-
-## Description
-
-CropMaster is a comprehensive solution for farmers and farm owners to manage their crops, farmlands, machinery, and other farm-related activities. The backend of the application is responsible for handling data storage, authentication, and communication with the frontend.
-
-## Features
-
-- User authentication and authorization
-- CRUD operations for farmers, farmlands, crops, machinery, and more
-- Secure password storage using encryption
-- API endpoints for data retrieval and manipulation
-- Integration with a database for data storage
+- User registration and login for farmers and owners
+- Farmer and owner dashboards
+- Farmland registration and farmer assignment
+- Crop registration and crop-to-farmland assignment
+- Disease reporting and crop disease tracking
+- Chemical and machinery usage tracking
+- Irrigation, harvest, and storage management
+- Soil and weather updates for farmland
+- PDF and CSV report generation
+- Multi-language support
+- Theme support with modern responsive UI
 
 ## Technologies Used
 
+### Frontend
+
+- React
+- Vite
+- Material UI
+- React Router DOM
+- Framer Motion
+- Chart.js
+- jsPDF
+- PapaParse
+
+### Backend
+
+- Java 17
 - Spring Boot
-- Spring Security
 - Spring Data JPA
-- MySQL (or your preferred database)
-- Java
-- Maven (or Gradle)
-- RESTful API design
+- Maven
+- jBCrypt
 
-## Getting Started
+### Database
 
-### Prerequisites
+- MySQL
 
-- Java Development Kit (JDK) 8 or higher
-- Maven or Gradle (for dependency management)
-- MySQL database (or another supported database)
+## Project Structure
 
-## Usage
+```text
+e19-co226-agriculture-management-system/
+|-- Front End/
+|-- Back End/
+|-- docs/
+`-- README.md
+```
 
-Once the backend is up and running, you can interact with the API using the defined endpoints. Refer to the API documentation or codebase for details on available endpoints and their usage.
+## Database
+
+The project uses a MySQL database named `cropmaster`.
+
+Main data entities include:
+
+- Owner
+- Farmer
+- Farmland
+- Crop
+- Chemical
+- ChemicalUsage
+- Machinery
+- MachineryUsage
+- Irrigation
+- Harvest
+- Storage
+- Disease
+- HostCrop
+- Soil
+- Weather
+
+## How to Run the Project
+
+### 1. Start the database
+
+Create a MySQL database named:
+
+```sql
+CREATE DATABASE cropmaster;
+```
+
+Update database credentials in:
+
+`Back End/src/main/resources/application.properties`
+
+### 2. Run the backend
+
+Go to the backend folder:
+
+```bash
+cd "Back End"
+```
+
+Run the Spring Boot application:
+
+```bash
+mvnw.cmd spring-boot:run
+```
+
+The backend will run on:
+
+```text
+http://localhost:8080
+```
+
+### 3. Run the frontend
+
+Go to the frontend folder:
+
+```bash
+cd "Front End"
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the frontend:
+
+```bash
+npm run start
+```
+
+The frontend will run on:
+
+```text
+http://localhost:5173
+```
+
+## API Summary
+
+The backend provides REST APIs for:
+
+- owner management
+- farmer management
+- farmland management
+- crop management
+- disease management
+- chemical usage
+- machinery usage
+- irrigation
+- harvest
+- storage
+- soil updates
+- weather updates
+- reporting-related data access
+
+## Documentation
+
+Detailed technical documentation is available in:
+
+- `docs/PROJECT_DOCUMENTATION.md`
+
+## Future Improvements
+
+- Use environment variables for API URLs and secrets
+- Add token-based authentication
+- Add Swagger/OpenAPI documentation
+- Add stronger database constraints and validation
+- Add more automated tests
+
+## Team
+
+- E/19/300, Premawansha L M A H
+- E/19/295, Premachandra K H J D
+- E/19/304, Pushpakumara R M S P
+
+## Conclusion
+
+CropMaster is designed as a practical smart agriculture platform that helps improve farm management through digital record keeping, monitoring, and reporting. It brings together landowners and farmers in one connected system.

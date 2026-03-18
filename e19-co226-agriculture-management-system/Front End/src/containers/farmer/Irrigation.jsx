@@ -4,6 +4,7 @@ import {
     Paper, TextField, InputLabel, FormControl, Stack, Alert, 
     Snackbar, CircularProgress, IconButton, Divider, Grid
 } from '@mui/material';
+import { motion } from 'framer-motion';
 import { useNic } from "../../components/NicContext.jsx";
 import { 
     ChevronLeft, 
@@ -13,11 +14,22 @@ import {
 } from '@mui/icons-material';
 
 // --- CropMaster Theme Palette ---
-const BG_CREME = '#FDFCF8';        
-const SAGE_DARK = '#2C3E35';       
-const SAGE_LIGHT = '#F4F7F5';      
-const BORDER_COLOR = '#E5E2D9';    
+const BG_CREME = '#fffdf2';        
+const SAGE_DARK = '#0f172a';       
+const SAGE_LIGHT = '#fdfcf0';      
+const BORDER_COLOR = '#cad2c5';    
 const ACCENT_BLUE = '#2E86C1'; // Irrigation accent
+
+// --- Animations ---
+const containerParams = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemParams = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
 
 const inputStyle = {
     '& .MuiOutlinedInput-root': {
@@ -46,16 +58,35 @@ const AddIrrigationMethod = () => {
     const showNotify = (msg, sev) => setNotification({ open: true, message: msg, severity: sev });
 
     const fetchData = async () => {
+        if (!nic) return;
+        setLoading(true);
         try {
-            const [resFarmers, resLands, resIrr] = await Promise.all([
-                fetch('http://localhost:8080/farmer/getAll'),
-                fetch(`http://localhost:8080/farmland/getAll/${nic}`),
-                fetch('http://localhost:8080/irrigation/getAll')
+            // First get farmer's owner context
+            const resProfile = await fetch(`http://localhost:8080/farmer/${nic}`);
+            if (!resProfile.ok) throw new Error("Could not fetch profile");
+            const profile = await resProfile.json();
+            const ownerNIC = profile?.ownerNIC;
+
+            if (!ownerNIC) {
+                console.warn("Farmer has no owner context");
+                setLoading(false);
+                return;
+            }
+
+            const [resFarmer, resLand, resIrr] = await Promise.all([
+                fetch(`http://localhost:8080/farmer/byOwner/${ownerNIC}`),
+                fetch(`http://localhost:8080/farmland/getAll/${nic}/${ownerNIC}`),
+                fetch(`http://localhost:8080/irrigation/byFarmer/${nic}`)
             ]);
-            if (resFarmers.ok) setFarmers(await resFarmers.json());
-            if (resLands.ok) setFarmlands(await resLands.json());
+            
+            if (resFarmer.ok) setFarmers(await resFarmer.json());
+            if (resLand.ok) setFarmlands(await resLand.json());
             if (resIrr.ok) setIrrigationMethods(await resIrr.json());
-        } catch (error) { console.error("Fetch Error:", error); }
+        } catch (error) { 
+            console.error("Fetch Error:", error);
+            showNotify("Could not load data", "error");
+        }
+        setLoading(false);
     };
 
     useEffect(() => { if (nic) fetchData(); }, [nic]);
@@ -74,7 +105,7 @@ const AddIrrigationMethod = () => {
             const res = await fetch('http://localhost:8080/irrigation/addNew', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(irrigationData),
+                body: JSON.stringify({ ...irrigationData, farmerNIC: nic }),
             });
             if (res.ok) {
                 showNotify('Irrigation Protocol Saved', 'success');
@@ -100,10 +131,10 @@ const AddIrrigationMethod = () => {
     };
 
     return (
-        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK }}>
+        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK, overflowX: 'hidden' }}>
             
             {/* Top Navigation */}
-            <Box sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
+            <Box component={motion.div} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <IconButton size="small" sx={{ border: `1px solid ${BORDER_COLOR}` }} onClick={() => window.history.back()}>
                         <ChevronLeft />
@@ -117,11 +148,11 @@ const AddIrrigationMethod = () => {
                 </Typography>
             </Box>
 
-            <Container maxWidth="lg" sx={{ mt: 6 }}>
+            <Container maxWidth="lg" sx={{ mt: 6 }} component={motion.div} variants={containerParams} initial="hidden" animate="show">
                 <Grid container spacing={4}>
                     
                     {/* Left: New System Registry */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>Systems</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>Register new water delivery infrastructure.</Typography>
@@ -146,7 +177,7 @@ const AddIrrigationMethod = () => {
                                     disabled={loading}
                                     fullWidth
                                     startIcon={<WaterDrop />}
-                                    sx={{ bgcolor: SAGE_DARK, color: '#fff', py: 2, borderRadius: '12px', fontWeight: 700, textTransform: 'none', '&:hover': { bgcolor: '#1a2621' } }}
+                                    sx={{ bgcolor: SAGE_DARK, color: '#fff', py: 2, borderRadius: '12px', fontWeight: 700, textTransform: 'none', '&:hover': { bgcolor: '#1e293b' } }}
                                 >
                                     {loading ? <CircularProgress size={24} color="inherit" /> : "Save System"}
                                 </Button>
@@ -155,7 +186,7 @@ const AddIrrigationMethod = () => {
                     </Grid>
 
                     {/* Right: Assignment */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>Deployment</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>Connect systems to specific land assets.</Typography>

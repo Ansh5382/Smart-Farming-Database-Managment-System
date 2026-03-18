@@ -12,4 +12,9 @@ public interface OwnerService {
 
     public Owner findByNic(String nic);
 
+    public ResponseEntity<String> deleteOwner(String nic, String password);
+
+    public ResponseEntity<String> changePassword(String nic, String currentPassword, String newPassword);
+
+    public ResponseEntity<Owner> updateProfile(String nic, Owner updatedFields);
 }

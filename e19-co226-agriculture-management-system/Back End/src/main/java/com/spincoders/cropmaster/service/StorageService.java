@@ -9,4 +9,6 @@ public interface StorageService {
     public Storage saveStorage(Storage storage);
 
     public List<Storage> getAllStorage();
+
+    public List<Storage> getStorageByFarmer(String farmerNIC);
 }

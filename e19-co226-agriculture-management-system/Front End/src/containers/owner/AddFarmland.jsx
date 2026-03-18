@@ -1,17 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import {
     Container, Typography, TextField, Button, Box, MenuItem, 
-    Select, Paper, InputLabel, FormControl, Grid, Stack, Divider
+    Select, Paper, InputLabel, FormControl, Grid, Stack, Divider,
+    Snackbar, Alert, CircularProgress
 } from '@mui/material';
 import LandscapeIcon from '@mui/icons-material/Landscape';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
+import { motion } from 'framer-motion';
+import { useNic } from "../../components/NicContext.jsx";
 
+// --- Animations ---
+const containerParams = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemParams = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
 // --- CropMaster Theme Palette ---
-const BG_CREME = '#FDFCF8';        
-const SAGE_DARK = '#2C3E35';       
-const BORDER_COLOR = '#E5E2D9';    
-const ACCENT_GREEN = '#8BA888';
+const BG_CREME = '#fffdf2';        
+const SAGE_DARK = '#2f3e46';       
+const BORDER_COLOR = '#cad2c5';    
+const ACCENT_GREEN = '#52796f';
 
 const formCardStyle = {
     p: 4, 
@@ -43,34 +56,71 @@ const AddFarmland = () => {
     const [selectedFarmland, setSelectedFarmland] = useState('');
     const [selectedAssignFarmer, setSelectedAssignFarmer] = useState('');
     const [selectedAssignFarmland, setSelectedAssignFarmland] = useState('');
+    
+    // UI Feedback
+    const [loading, setLoading] = useState(false);
+    const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
+    const { nic: ownerNIC } = useNic();
 
     useEffect(() => {
-        fetch('http://localhost:8080/farmer/getAll').then(res => res.json()).then(data => setFarmers(data));
-        fetch('http://localhost:8080/farmland/noNic').then(res => res.json()).then(data => setFarmlands(data));
-        fetch('http://localhost:8080/farmland/nic').then(res => res.json()).then(data => setNicFarmlands(data));
-    }, []);
+        if (!ownerNIC) return;
+        fetch(`http://localhost:8080/farmer/byOwner/${ownerNIC}`).then(res => res.json()).then(data => setFarmers(data));
+        fetch(`http://localhost:8080/farmland/noNicByOwner/${ownerNIC}`).then(res => res.json()).then(data => setFarmlands(data));
+        fetch(`http://localhost:8080/farmland/nicByOwner/${ownerNIC}`).then(res => res.json()).then(data => setNicFarmlands(data));
+    }, [ownerNIC]);
 
-    const handleAddFarmland = () => {
-        const newFarmland = { name, size, location };
-        fetch('http://localhost:8080/farmland/addNew', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newFarmland),
-        }).then(() => window.location.reload());
+    const showNotify = (msg, sev) => setNotification({ open: true, message: msg, severity: sev });
+
+    const handleAddFarmland = async () => {
+        if (!name || !size || !location) return showNotify("Please fill all fields", "warning");
+        if (!ownerNIC) return showNotify("Owner session invalid", "error");
+        setLoading(true);
+        try {
+            const newFarmland = { name, size, location, ownerNIC };
+            const res = await fetch('http://localhost:8080/farmland/addNew', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newFarmland),
+            });
+            if (res.ok) {
+                showNotify("Land registered successfully!", "success");
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showNotify("Registration failed", "error");
+            }
+        } catch (e) { showNotify("Connection error", "error"); }
+        setLoading(false);
     };
 
-    const handleAssignFarmer = () => {
-        if (selectedFarmer && selectedFarmland) {
-            fetch(`http://localhost:8080/farmland/updateFarmer/${selectedFarmland}/${selectedFarmer}`, { method: 'PUT' })
-                .then(() => window.location.reload());
-        }
+    const handleAssignFarmer = async () => {
+        console.log("Assigning:", { selectedFarmland, selectedFarmer });
+        if (!selectedFarmer || !selectedFarmland) return showNotify("Please select both farmer and plot", "warning");
+        setLoading(true);
+        try {
+            const res = await fetch(`http://localhost:8080/farmland/updateFarmer/${selectedFarmland}/${selectedFarmer}`, { method: 'PUT' });
+            if (res.ok) {
+                showNotify("Personnel deployed successfully!", "success");
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showNotify("Deployment failed", "error");
+            }
+        } catch (e) { showNotify("Assignment error", "error"); }
+        setLoading(false);
     };
 
-    const handleUpdateAssignFarmer = () => {
-        if (selectedAssignFarmland && selectedAssignFarmer) {
-            fetch(`http://localhost:8080/farmland/updateFarmer/${selectedAssignFarmland}/${selectedAssignFarmer}`, { method: 'PUT' })
-                .then(() => window.location.reload());
-        }
+    const handleUpdateAssignFarmer = async () => {
+        if (!selectedAssignFarmland || !selectedAssignFarmer) return showNotify("Selection incomplete", "warning");
+        setLoading(true);
+        try {
+            const res = await fetch(`http://localhost:8080/farmland/updateFarmer/${selectedAssignFarmland}/${selectedAssignFarmer}`, { method: 'PUT' });
+            if (res.ok) {
+                showNotify("Management transferred successfully!", "success");
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showNotify("Transfer failed", "error");
+            }
+        } catch (e) { showNotify("Transfer error", "error"); }
+        setLoading(false);
     };
 
     return (
@@ -88,10 +138,10 @@ const AddFarmland = () => {
                     <Divider sx={{ width: 60, height: 4, bgcolor: ACCENT_GREEN, mx: 'auto', mt: 2, borderRadius: 1, border: 'none' }} />
                 </Box>
 
-                <Grid container spacing={4}>
+                <Grid container spacing={4} component={motion.div} variants={containerParams} initial="hidden" animate="show">
                     
                     {/* 1. Add New Farmland */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} component={motion.div} variants={itemParams}>
                         <Paper elevation={0} sx={formCardStyle}>
                             <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
                                 <LandscapeIcon sx={{ color: ACCENT_GREEN }} />
@@ -101,7 +151,7 @@ const AddFarmland = () => {
                                 <TextField label="Property Name" fullWidth sx={inputStyle} value={name} onChange={(e) => setName(e.target.value)} />
                                 <TextField label="Acreage / Size" fullWidth sx={inputStyle} value={size} onChange={(e) => setSize(e.target.value)} />
                                 <TextField label="Geographic Location" fullWidth sx={inputStyle} value={location} onChange={(e) => setLocation(e.target.value)} />
-                                <Button variant="contained" fullWidth onClick={handleAddFarmland} sx={{ bgcolor: SAGE_DARK, py: 1.5, borderRadius: '12px', fontWeight: 700, '&:hover': { bgcolor: '#1a2621' } }}>
+                                <Button variant="contained" fullWidth onClick={handleAddFarmland} sx={{ bgcolor: SAGE_DARK, py: 1.5, borderRadius: '12px', fontWeight: 700, '&:hover': { bgcolor: '#1e293b' } }}>
                                     Confirm Registration
                                 </Button>
                             </Stack>
@@ -109,7 +159,7 @@ const AddFarmland = () => {
                     </Grid>
 
                     {/* 2. Assign Farmer (Initial) */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} component={motion.div} variants={itemParams}>
                         <Paper elevation={0} sx={formCardStyle}>
                             <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
                                 <PersonAddIcon sx={{ color: ACCENT_GREEN }} />
@@ -139,8 +189,8 @@ const AddFarmland = () => {
                     </Grid>
 
                     {/* 3. Change Assignment (Re-assignment) */}
-                    <Grid item xs={12}>
-                        <Paper elevation={0} sx={{ ...formCardStyle, bgcolor: '#F4F7F5' }}>
+                    <Grid item xs={12} component={motion.div} variants={itemParams}>
+                        <Paper elevation={0} sx={{ ...formCardStyle, bgcolor: '#fdfcf0' }}>
                             <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
                                 <SyncAltIcon sx={{ color: SAGE_DARK }} />
                                 <Typography variant="h5" sx={{ fontWeight: 800 }}>Re-assignment Hub</Typography>
@@ -150,7 +200,7 @@ const AddFarmland = () => {
                                     <FormControl fullWidth sx={inputStyle}>
                                         <InputLabel>New Operator</InputLabel>
                                         <Select label="New Operator" value={selectedAssignFarmer} onChange={(e) => setSelectedAssignFarmer(e.target.value)}>
-                                            {farmers.map(f => <MenuItem key={f.nic} value={f.nic}>{f.name}</MenuItem>)}
+                                            {(Array.isArray(farmers) ? farmers : []).map(f => <MenuItem key={f.nic} value={f.nic}>{f.name}</MenuItem>)}
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -158,7 +208,7 @@ const AddFarmland = () => {
                                     <FormControl fullWidth sx={inputStyle}>
                                         <InputLabel>Current Managed Land</InputLabel>
                                         <Select label="Current Managed Land" value={selectedAssignFarmland} onChange={(e) => setSelectedAssignFarmland(e.target.value)}>
-                                            {nicFarmlands.map(f => <MenuItem key={f.farmlandID} value={f.farmlandID}>{f.name}</MenuItem>)}
+                                            {(Array.isArray(nicFarmlands) ? nicFarmlands : []).map(f => <MenuItem key={f.farmlandID} value={f.farmlandID}>{f.name}</MenuItem>)}
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -173,6 +223,17 @@ const AddFarmland = () => {
 
                 </Grid>
             </Container>
+
+            <Snackbar 
+                open={notification.open} 
+                autoHideDuration={4000} 
+                onClose={() => setNotification({ ...notification, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert severity={notification.severity} variant="filled" sx={{ width: '100%' }}>
+                    {notification.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };

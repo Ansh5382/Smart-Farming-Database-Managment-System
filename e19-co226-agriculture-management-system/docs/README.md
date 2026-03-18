@@ -30,7 +30,8 @@ This is a sample image, to show how to add images to your page. To learn more op
 1. [Introduction](#introduction)
 2. [Features](#features)
 3. [Usage](#usage)
-4. [Links](#links)
+4. [Detailed Documentation](#detailed-documentation)
+5. [Links](#links)
 
 ---
 
@@ -57,7 +58,18 @@ Crop Master is an Agriculture Management System designed to streamline and optim
 - Explore and manage your farmlands, crops, and resources.
 - Utilize the system's features to enhance your farming operations.
 
-.....
+## Detailed Documentation
+
+For the complete technical documentation of the project, including:
+
+- technology stack
+- system architecture
+- frontend and backend modules
+- REST API summary
+- database tables and logical relationships
+- setup and run instructions
+
+see [PROJECT_DOCUMENTATION.md](./PROJECT_DOCUMENTATION.md).
 
 ## Links
 

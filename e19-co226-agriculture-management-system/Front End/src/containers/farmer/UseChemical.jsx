@@ -4,6 +4,7 @@ import {
     FormControl, InputLabel, Select, MenuItem, Divider, Box,
     Stack, IconButton, CircularProgress, Snackbar, Alert
 } from '@mui/material';
+import { motion } from 'framer-motion';
 import { useNic } from "../../components/NicContext.jsx";
 import { 
     ChevronLeft, 
@@ -14,9 +15,9 @@ import {
 } from '@mui/icons-material';
 
 // --- CropMaster Theme Palette ---
-const BG_CREME = '#FDFCF8';        
-const SAGE_DARK = '#2C3E35';       
-const BORDER_COLOR = '#E5E2D9';    
+const BG_CREME = '#fffdf2';        
+const SAGE_DARK = '#2f3e46';       
+const BORDER_COLOR = '#cad2c5';    
 const ACCENT_ORANGE = '#D35400'; // Safety/Chemical accent
 
 const inputStyle = {
@@ -26,6 +27,17 @@ const inputStyle = {
         '& fieldset': { borderColor: BORDER_COLOR },
         '&:hover fieldset': { borderColor: SAGE_DARK },
     }
+};
+
+// --- Animations ---
+const containerParams = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemParams = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
 const AddChemical = () => {
@@ -50,9 +62,15 @@ const AddChemical = () => {
 
     const fetchData = async () => {
         try {
+            // First get farmer's owner context
+            const resProfile = await fetch(`http://localhost:8080/farmer/${nic}`);
+            if (!resProfile.ok) throw new Error("Could not fetch profile");
+            const profile = await resProfile.json();
+            const ownerNIC = profile.ownerNIC;
+
             const [resFarm, resChem] = await Promise.all([
-                fetch(`http://localhost:8080/farmland/getAll/${nic}`),
-                fetch('http://localhost:8080/chemical/getAll')
+                fetch(`http://localhost:8080/farmland/getAll/${nic}/${ownerNIC}`),
+                fetch(`http://localhost:8080/chemical/byFarmer/${nic}`)
             ]);
             if (resFarm.ok) setFarmlandData(await resFarm.json());
             if (resChem.ok) setChemData(await resChem.json());
@@ -72,7 +90,7 @@ const AddChemical = () => {
             const res = await fetch('http://localhost:8080/chemical/addNew', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(chemicalData),
+                body: JSON.stringify({ ...chemicalData, farmerNIC: nic }),
             });
             if (res.ok) {
                 showNotify('Chemical registered successfully', 'success');
@@ -109,10 +127,10 @@ const AddChemical = () => {
     };
 
     return (
-        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK }}>
+        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK, overflowX: 'hidden' }}>
             
             {/* Top Navigation */}
-            <Box sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
+            <Box component={motion.div} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <IconButton size="small" sx={{ border: `1px solid ${BORDER_COLOR}` }} onClick={() => window.history.back()}>
                         <ChevronLeft />
@@ -126,11 +144,11 @@ const AddChemical = () => {
                 </Typography>
             </Box>
 
-            <Container maxWidth="lg" sx={{ mt: 6 }}>
+            <Container maxWidth="lg" sx={{ mt: 6 }} component={motion.div} variants={containerParams} initial="hidden" animate="show">
                 <Grid container spacing={4}>
                     
                     {/* Left side: Chemical Registry */}
-                    <Grid item xs={12} md={7}>
+                    <Grid item xs={12} md={7} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>Chemical Registry</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>Maintain the global safety and handling database.</Typography>
@@ -173,13 +191,13 @@ const AddChemical = () => {
                     </Grid>
 
                     {/* Right side: Report Usage */}
-                    <Grid item xs={12} md={5}>
+                    <Grid item xs={12} md={5} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>Field Application</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>Log chemical usage on specific land assets.</Typography>
                         </Box>
 
-                        <Paper elevation={0} sx={{ p: 4, borderRadius: '24px', border: `1px solid ${BORDER_COLOR}`, bgcolor: '#F4F7F5' }}>
+                        <Paper elevation={0} sx={{ p: 4, borderRadius: '24px', border: `1px solid ${BORDER_COLOR}`, bgcolor: '#fdfcf0' }}>
                             <Stack spacing={3}>
                                 <FormControl fullWidth sx={inputStyle}>
                                     <InputLabel>Select Farmland</InputLabel>

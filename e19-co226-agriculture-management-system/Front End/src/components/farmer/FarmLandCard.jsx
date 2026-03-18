@@ -1,26 +1,23 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import {Divider} from "@mui/material";
+import {
+    Box, Card, CardActions, CardContent, Button, Typography,
+    Dialog, DialogContent, DialogTitle, Divider, Stack, IconButton, useTheme
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 function FarmLandCard({
-                          farmlandID,
-                          name,
-                          size,
-                          location,
-                          isCropped,
-                      }) {
+    farmlandID,
+    name,
+    size,
+    location,
+    isCropped,
+    displayIndex,
+}) {
+    const theme = useTheme();
 
     const [plantDetails, setPlantDetails] = React.useState(null);
     const [soilDetails, setSoilDetails] = React.useState(null);
     const [weatherDetails, setWeatherDetails] = React.useState(null);
-    const [openDialog, setOpenDialog] = React.useState(false);
 
     const [openPlantDialog, setOpenPlantDialog] = React.useState(false);
     const [openSoilDialog, setOpenSoilDialog] = React.useState(false);
@@ -34,16 +31,25 @@ function FarmLandCard({
     const [openMachineryDialog, setOpenMachineryDialog] = React.useState(false);
     const [machineryData, setMachineryData] = React.useState([]);
 
+    React.useEffect(() => {
+        if (isCropped) {
+            fetch(`http://localhost:8080/soil/getDetails/${farmlandID}`)
+                .then((res) => res.json())
+                .then(setSoilDetails)
+                .catch(console.error);
+            
+            fetch(`http://localhost:8080/weather/getDetails/${farmlandID}`)
+                .then((res) => res.json())
+                .then(setWeatherDetails)
+                .catch(console.error);
+        }
+    }, [farmlandID, isCropped]);
 
     const handleViewPlantClick = async () => {
         try {
-            // Fetch the cropID from the first URL
             const response = await fetch(`http://localhost:8080/farmland/getCrop/${farmlandID}`);
-            // Assuming the response only contains the cropID as an integer value
             const cropID = await response.text();
-            // Fetch the plant details using the received crop ID
             const plantResponse = await fetch(`http://localhost:8080/crop/getbyID/${cropID}`);
-            // Assuming the plantResponse is a JSON containing plant details
             const plantData = await plantResponse.json();
             setPlantDetails(plantData);
             setOpenPlantDialog(true);
@@ -54,291 +60,187 @@ function FarmLandCard({
 
     const handleViewSoilClick = () => {
         fetch(`http://localhost:8080/soil/getDetails/${farmlandID}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setSoilDetails(data);
-                setOpenSoilDialog(true);
-            })
-            .catch((error) => {
-                console.error('Error fetching soil details:', error);
-            });
+            .then((res) => res.json())
+            .then((data) => { setSoilDetails(data); setOpenSoilDialog(true); })
+            .catch((err) => console.error(err));
     };
 
     const handleViewWeatherClick = () => {
         fetch(`http://localhost:8080/weather/getDetails/${farmlandID}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setWeatherDetails(data);
-                setOpenWeatherDialog(true);
-            })
-            .catch((error) => {
-                console.error('Error fetching weather details:', error);
-            });
-    };
-
-    const handleClosePlantDialog = () => {
-        setOpenPlantDialog(false);
-    };
-
-    const handleCloseSoilDialog = () => {
-        setOpenSoilDialog(false);
-    };
-
-    const handleCloseWeatherDialog = () => {
-        setOpenWeatherDialog(false);
+            .then((res) => res.json())
+            .then((data) => { setWeatherDetails(data); setOpenWeatherDialog(true); })
+            .catch((err) => console.error(err));
     };
 
     const handleViewDiseaseClick = () => {
         fetch(`http://localhost:8080/hostcrop/getDisease/${farmlandID}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setDiseaseData(data);
-                setOpenDiseaseDialog(true);
-            })
-            .catch((error) => {
-                console.error('Error fetching disease data:', error);
-            });
-    };
-
-    const handleCloseDiseaseDialog = () => {
-        setOpenDiseaseDialog(false);
+            .then((res) => res.json())
+            .then((data) => { setDiseaseData(data); setOpenDiseaseDialog(true); })
+            .catch((err) => console.error(err));
     };
 
     const handleViewChemicalClick = () => {
         fetch(`http://localhost:8080/chemicalusage/getChemical/${farmlandID}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setChemicalData(data);
-                setOpenChemicalDialog(true);
-            })
-            .catch((error) => {
-                console.error('Error fetching chemical usage data:', error);
-            });
-    };
-
-    const handleCloseChemicalDialog = () => {
-        setOpenChemicalDialog(false);
+            .then((res) => res.json())
+            .then((data) => { setChemicalData(data); setOpenChemicalDialog(true); })
+            .catch((err) => console.error(err));
     };
 
     const handleViewMachineryClick = () => {
         fetch(`http://localhost:8080/machineryusage/getMachinery/${farmlandID}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setMachineryData(data);
-                setOpenMachineryDialog(true);
-            })
-            .catch((error) => {
-                console.error('Error fetching machinery usage data:', error);
-            });
+            .then((res) => res.json())
+            .then((data) => { setMachineryData(data); setOpenMachineryDialog(true); })
+            .catch((err) => console.error(err));
     };
 
-    const handleCloseMachineryDialog = () => {
-        setOpenMachineryDialog(false);
-    };
+    // Dialog Header Component
+    const ModernDialogTitle = ({ title, onClose }) => (
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>{title}</Typography>
+            <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
+        </DialogTitle>
+    );
 
+    // Dialog Item Row
+    const DetailRow = ({ label, value }) => (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1, borderBottom: `1px solid ${theme.palette.divider}` }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>{label}</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>{value}</Typography>
+        </Box>
+    );
 
-
-    const cardStyle = { padding: '20px 30px', width: '500', margin: '0px auto',backgroundColor: 'rgb(200, 200, 200)'};
-    const card2Style = {  width: '500',backgroundColor: 'rgba(1, 32, 93, 0.5)' ,};
-
-
-    const cardContent = (
-        <React.Fragment >
-            <CardContent style={cardStyle}>
-                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    Farmland ID: {farmlandID}
-                </Typography>
-                <Typography variant="h5" component="div">
-                    {name}
-                </Typography>
-                <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                    Size: {size}
-                </Typography>
-                <Typography variant="body2">Location: {location}</Typography>
-            </CardContent>
-            <Divider/>
-            <CardActions style={cardStyle}>
-
-                <Button size="small" color="primary" variant="contained" sx={{backgroundColor: 'rgba(1, 32, 93, 0.6)'}} onClick={handleViewSoilClick}>
-                    SOIL DATA
-                </Button>
-                <Button size="small" color="primary" variant="contained" sx={{backgroundColor: 'rgba(1, 32, 93, 0.6)'}} onClick={handleViewWeatherClick}>
-                    WEATHER DATA
-                </Button>
-                <Button size="small" color="primary" variant="contained" sx={{backgroundColor: 'rgba(1, 32, 93, 0.6)'}} onClick={handleViewDiseaseClick}>
-                    REPORTED DISEASES
-                </Button>
-                <Button size="small" color="primary" variant="contained" sx={{backgroundColor: 'rgba(1, 32, 93, 0.6)'}} onClick={handleViewChemicalClick}>
-                    USED CHEMICALS
-                </Button>
-                <Button size="small" color="primary" variant="contained" sx={{backgroundColor: 'rgba(1, 32, 93, 0.6)'}} onClick={handleViewMachineryClick}>
-                    USED MACHINERY
-                </Button>
-                {isCropped && (
-                    <>
-                        <Button size="small" color="primary" variant="contained" sx={{backgroundColor: 'rgba(1, 32, 93, 0.6)'}} onClick={handleViewPlantClick}>
-                            CROP DATA
-                        </Button>
-                    </>
-                )}
-            </CardActions>
-        </React.Fragment>
+    const TrendItem = ({ label, value, unit = "" }) => (
+        <Box sx={{ flex: 1, p: 1.5, borderRadius: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, display: 'block', fontSize: '9px', textTransform: 'uppercase' }}>{label}</Typography>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{value}<span style={{ fontSize: '10px' }}>{unit}</span></Typography>
+        </Box>
     );
 
     return (
-        <Box sx={{ minWidth: 275 }} >
-            <Card  variant="outlined" style={card2Style}>{cardContent}</Card>
-            <Dialog open={openPlantDialog} onClose={handleClosePlantDialog}>
-                <DialogContent style={cardStyle}>
+        <Box>
+            <Card elevation={0} sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'transparent' }}>
+                <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'primary.main', bgcolor: 'primary.light', px: 1.5, py: 0.5, borderRadius: 1, color: '#fff' }}>
+                            ID: {displayIndex != null ? displayIndex : farmlandID}
+                        </Typography>
+                        {isCropped && (
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'success.main', bgcolor: 'success.light', px: 1.5, py: 0.5, borderRadius: 1, color: '#fff' }}>
+                                Cultivated
+                            </Typography>
+                        )}
+                    </Box>
+                    <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>{name}</Typography>
+                    
+                    <Stack spacing={1} sx={{ mt: 2 }}>
+                        <DetailRow label="Size" value={size} />
+                        <DetailRow label="Location" value={location} />
+                    </Stack>
+
+                    {isCropped && (
+                        <Box sx={{ mt: 3 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', mb: 1, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>Quick Status</Typography>
+                            <Stack direction="row" spacing={1}>
+                                <TrendItem label="Temp" value={weatherDetails?.temperature || '--'} unit="°C" />
+                                <TrendItem label="Soil pH" value={soilDetails?.ph || '--'} />
+                                <TrendItem label="Humidity" value={weatherDetails?.humidity || '--'} unit="%" />
+                            </Stack>
+                        </Box>
+                    )}
+                </CardContent>
+                
+                <CardActions sx={{ px: 3, pb: 3, pt: 0, flexWrap: 'wrap', gap: 1 }}>
+                    <Button size="small" variant="outlined" color="secondary" onClick={handleViewSoilClick} sx={{ borderRadius: 2 }}>Soil</Button>
+                    <Button size="small" variant="outlined" color="info" onClick={handleViewWeatherClick} sx={{ borderRadius: 2 }}>Weather</Button>
+                    <Button size="small" variant="outlined" color="error" onClick={handleViewDiseaseClick} sx={{ borderRadius: 2 }}>Diseases</Button>
+                    <Button size="small" variant="outlined" color="warning" onClick={handleViewChemicalClick} sx={{ borderRadius: 2 }}>Chemicals</Button>
+                    <Button size="small" variant="outlined" color="neutral" onClick={handleViewMachineryClick} sx={{ borderRadius: 2 }}>Machinery</Button>
+                    {isCropped && (
+                        <Button size="small" variant="contained" color="primary" onClick={handleViewPlantClick} sx={{ borderRadius: 2 }}>Crop Data</Button>
+                    )}
+                </CardActions>
+            </Card>
+
+            {/* Dialogs */}
+            <Dialog open={openPlantDialog} onClose={() => setOpenPlantDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title="Crop Details" onClose={() => setOpenPlantDialog(false)} />
+                <DialogContent dividers>
                     {plantDetails ? (
-                        <Typography variant="body2" style={{ textAlign: 'left', padding: '16px' }}>
-                            <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                <b>PLANT DETAILS</b>
-                            </h2>
-                            <p style={{ fontSize: '16px', lineHeight: '1.6' }}>
-                                <span style={{ fontWeight: 'bold' }}>Name:</span> {plantDetails.name}<br />
-                                <span style={{ fontWeight: 'bold' }}>Variety:</span> {plantDetails.variety}<br />
-                            </p>
-                        </Typography>
-                    ) : (
-                        <Typography variant="body2" style={{ textAlign: 'center', padding: '16px' }}>
-                            No plant details available
-                        </Typography>
-                    )}
+                        <Stack spacing={0}>
+                            <DetailRow label="Name" value={plantDetails.name} />
+                            <DetailRow label="Variety" value={plantDetails.variety} />
+                        </Stack>
+                    ) : <Typography align="center" color="text.secondary" py={4}>No data available</Typography>}
                 </DialogContent>
-
-
-
             </Dialog>
-            <Dialog open={openSoilDialog} onClose={handleCloseSoilDialog}>
-                <DialogContent style={cardStyle}>
+
+            <Dialog open={openSoilDialog} onClose={() => setOpenSoilDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title="Soil Conditions" onClose={() => setOpenSoilDialog(false)} />
+                <DialogContent dividers>
                     {soilDetails ? (
-                        <Typography variant="body2" style={{ textAlign: 'left', padding: '16px' }}>
-                            <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                <b>SOIL DETAILS</b>
-                            </h2>
-                            <p style={{ fontSize: '16px', lineHeight: '1.6' }}>
-                                <span style={{ fontWeight: 'bold' }}>Temperature:</span> {soilDetails.temperature}<br />
-                                <span style={{ fontWeight: 'bold' }}>pH:</span> {soilDetails.ph}<br />
-                                <span style={{ fontWeight: 'bold' }}>Structure:</span> {soilDetails.structure}<br />
-                                <span style={{ fontWeight: 'bold' }}>Water Holding:</span> {soilDetails.waterholding}<br />
-                                <span style={{ fontWeight: 'bold' }}>Nutrition:</span> {soilDetails.nutrition}<br />
-                                <br />
-                            </p>
-                        </Typography>
-                    ) : (
-                        <Typography variant="body2" style={{ textAlign: 'center', padding: '16px' }}>
-                            <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                <b>No Data Available</b>
-                            </h2>
-                        </Typography>
-                    )}
+                        <Stack spacing={0}>
+                            <DetailRow label="Temperature" value={soilDetails.temperature} />
+                            <DetailRow label="pH Level" value={soilDetails.ph} />
+                            <DetailRow label="Structure" value={soilDetails.structure} />
+                            <DetailRow label="Water Holding" value={soilDetails.waterholding} />
+                            <DetailRow label="Nutrition" value={soilDetails.nutrition} />
+                        </Stack>
+                    ) : <Typography align="center" color="text.secondary" py={4}>No data available</Typography>}
                 </DialogContent>
-
             </Dialog>
-            <Dialog open={openWeatherDialog} onClose={handleCloseWeatherDialog}>
-                <DialogContent style={cardStyle}>
+
+            <Dialog open={openWeatherDialog} onClose={() => setOpenWeatherDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title="Weather Data" onClose={() => setOpenWeatherDialog(false)} />
+                <DialogContent dividers>
                     {weatherDetails ? (
-                        <Typography variant="body2" style={{ textAlign: 'left', padding: '16px' }}>
-                            <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                <b>WEATHER DETAILS</b>
-                            </h2>
-                            <p style={{ fontSize: '16px', lineHeight: '1.6' }}>
-                                <span style={{ fontWeight: 'bold' }}>Temperature:</span> {weatherDetails.temperature}<br />
-                                <span style={{ fontWeight: 'bold' }}>Rainfall:</span> {weatherDetails.rainfall}<br />
-                                <span style={{ fontWeight: 'bold' }}>Humidity:</span> {weatherDetails.humidity}<br />
-                                <span style={{ fontWeight: 'bold' }}>Wind Speed:</span> {weatherDetails.windspeed}<br />
-                                <span style={{ fontWeight: 'bold' }}>Radiation:</span> {weatherDetails.radiation}<br />
-                                <br />
-                            </p>
-                        </Typography>
-                    ) : (
-                        <Typography variant="body2" style={{ textAlign: 'center', padding: '16px' }}>
-                            <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                <b>No Data Available</b>
-                            </h2>
-                        </Typography>
-                    )}
+                        <Stack spacing={0}>
+                            <DetailRow label="Temperature" value={weatherDetails.temperature} />
+                            <DetailRow label="Rainfall" value={weatherDetails.rainfall} />
+                            <DetailRow label="Humidity" value={weatherDetails.humidity} />
+                            <DetailRow label="Wind Speed" value={weatherDetails.windspeed} />
+                            <DetailRow label="Radiation" value={weatherDetails.radiation} />
+                        </Stack>
+                    ) : <Typography align="center" color="text.secondary" py={4}>No data available</Typography>}
                 </DialogContent>
-
             </Dialog>
-            <Dialog open={openDiseaseDialog} onClose={handleCloseDiseaseDialog}>
-                <DialogContent style={cardStyle}>
-                    {diseaseData && diseaseData.length > 0 ? (
-                        diseaseData.map((disease) => (
-                            <Typography variant="body2" style={{ textAlign: 'left', padding: '16px' }} key={disease.hostcropID}>
-                                <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                    <b>REPORTED DISEASES</b>
-                                </h2>
-                                <p style={{ fontSize: '16px', lineHeight: '1.6' }}>
-                                    <span style={{ fontWeight: 'bold' }}>Disease Name:</span> {disease.diseaseName}<br />
-                                    <span style={{ fontWeight: 'bold' }}>Reported NIC:</span> {disease.nic}<br />
-                                    <span style={{ fontWeight: 'bold' }}>Reported Date:</span> {disease.date}<br />
-                                    <br />
-                                </p>
-                            </Typography>
-                        ))
-                    ) : (
-                        <Typography variant="body2" style={{ textAlign: 'center', padding: '16px' }}>
-                            <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                <b>No Data Available</b>
-                            </h2>
-                        </Typography>
-                    )}
-                </DialogContent>
 
+            <Dialog open={openDiseaseDialog} onClose={() => setOpenDiseaseDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title="Reported Diseases" onClose={() => setOpenDiseaseDialog(false)} />
+                <DialogContent dividers>
+                    {diseaseData?.length > 0 ? diseaseData.map((d, i) => (
+                        <Box key={i} sx={{ mb: 3, p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+                            <DetailRow label="Disease" value={d.diseaseName} />
+                            <DetailRow label="Reporter NIC" value={d.nic} />
+                            <DetailRow label="Date" value={d.date} />
+                        </Box>
+                    )) : <Typography align="center" color="text.secondary" py={4}>No diseases reported</Typography>}
+                </DialogContent>
             </Dialog>
-            <Dialog open={openChemicalDialog} onClose={handleCloseChemicalDialog}>
-                <DialogContent style={cardStyle}>
-                    {chemicalData && chemicalData.length > 0 ? (
-                        chemicalData.map((chemical) => (
-                            <Typography variant="body2" style={{ textAlign: 'left', padding: '16px' }} key={chemical.chemicalUsageID}>
-                                <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                    <b>USED CHEMICALS</b>
-                                </h2>
-                                <p style={{ fontSize: '16px', lineHeight: '1.6' }}>
-                                    <span style={{ fontWeight: 'bold' }}>Chemical Name:</span> {chemical.chemicalName}<br />
-                                    <span style={{ fontWeight: 'bold' }}>User NIC:</span> {chemical.nic}<br />
-                                    <span style={{ fontWeight: 'bold' }}>Use Date:</span> {chemical.date}<br />
-                                    <br />
-                                </p>
-                            </Typography>
-                        ))
-                    ) : (
-                        <Typography variant="body2" style={{ textAlign: 'center', padding: '16px' }}>
-                            <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                <b>No Data Available</b>
-                            </h2>
-                        </Typography>
-                    )}
-                </DialogContent>
 
+            <Dialog open={openChemicalDialog} onClose={() => setOpenChemicalDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title="Chemical Usage" onClose={() => setOpenChemicalDialog(false)} />
+                <DialogContent dividers>
+                    {chemicalData?.length > 0 ? chemicalData.map((c, i) => (
+                        <Box key={i} sx={{ mb: 3, p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+                            <DetailRow label="Chemical" value={c.chemicalName} />
+                            <DetailRow label="User NIC" value={c.nic} />
+                            <DetailRow label="Date" value={c.date} />
+                        </Box>
+                    )) : <Typography align="center" color="text.secondary" py={4}>No chemicals used</Typography>}
+                </DialogContent>
             </Dialog>
-            <Dialog open={openMachineryDialog} onClose={handleCloseMachineryDialog}>
-                <DialogContent style={cardStyle}>
-                    {machineryData && machineryData.length > 0 ? (
-                        machineryData.map((machinery) => (
-                            <Typography variant="body2" style={{ textAlign: 'left', padding: '16px' }} key={machinery.machineryusageID}>
-                                <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                    <b>USED MACHINERY</b>
-                                </h2>
-                                <p style={{ fontSize: '16px', lineHeight: '1.6' }}>
-                                    <span style={{ fontWeight: 'bold' }}>Machinery Name:</span> {machinery.machineryName}<br />
-                                    <span style={{ fontWeight: 'bold' }}>User NIC:</span> {machinery.nic}<br />
-                                    <span style={{ fontWeight: 'bold' }}>Use Date:</span> {machinery.date}<br />
-                                    <br />
-                                </p>
-                            </Typography>
-                        ))
-                    ) : (
-                        <Typography variant="body2" style={{ textAlign: 'center', padding: '16px' }}>
-                            <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                                <b>No Data Available</b>
-                            </h2>
-                        </Typography>
-                    )}
-                </DialogContent>
 
+            <Dialog open={openMachineryDialog} onClose={() => setOpenMachineryDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title="Machinery Usage" onClose={() => setOpenMachineryDialog(false)} />
+                <DialogContent dividers>
+                    {machineryData?.length > 0 ? machineryData.map((m, i) => (
+                        <Box key={i} sx={{ mb: 3, p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+                            <DetailRow label="Machinery" value={m.machineryName} />
+                            <DetailRow label="User NIC" value={m.nic} />
+                            <DetailRow label="Date" value={m.date} />
+                        </Box>
+                    )) : <Typography align="center" color="text.secondary" py={4}>No machinery used</Typography>}
+                </DialogContent>
             </Dialog>
         </Box>
     );

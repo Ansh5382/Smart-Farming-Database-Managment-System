@@ -22,4 +22,9 @@ public class MachineryImplementation implements MachineryService{
     public List<Machinery> getAllMachinery() {
         return machineryRepositary.findAll();
     }
+
+    @Override
+    public List<Machinery> getMachineryByFarmer(String farmerNIC) {
+        return machineryRepositary.findByFarmerNIC(farmerNIC);
+    }
 }

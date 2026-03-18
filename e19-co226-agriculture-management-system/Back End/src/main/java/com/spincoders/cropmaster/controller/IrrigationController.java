@@ -27,5 +27,10 @@ public class IrrigationController {
         return irrigationService.getAllIrrigation();
     }
 
+    @GetMapping("/byFarmer/{farmerNIC}")
+    public List<Irrigation> getByFarmer(@PathVariable String farmerNIC) {
+        return irrigationService.getIrrigationByFarmer(farmerNIC);
+    }
+
 
 }

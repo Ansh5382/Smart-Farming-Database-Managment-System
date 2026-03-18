@@ -29,5 +29,10 @@ public class HarvestController {
         return harvestService.getAllHarvest();
     }
 
+    @GetMapping("/byFarmer/{farmerNIC}")
+    public List<Harvest> getByFarmer(@PathVariable String farmerNIC) {
+        return harvestService.getHarvestByFarmer(farmerNIC);
+    }
+
 
 }

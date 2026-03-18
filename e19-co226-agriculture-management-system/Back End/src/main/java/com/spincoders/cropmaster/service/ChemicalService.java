@@ -7,4 +7,5 @@ import java.util.List;
 public interface ChemicalService {
     public Chemical saveChemical(Chemical chemical);
     public List<Chemical> getAllChemical();
+    public List<Chemical> getChemicalByFarmer(String farmerNIC);
 }

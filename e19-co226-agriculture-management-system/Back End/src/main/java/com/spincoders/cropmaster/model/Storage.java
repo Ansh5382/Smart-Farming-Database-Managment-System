@@ -25,7 +25,18 @@ public class Storage {
     @Column(name = "temperature")
     private String temperature;
 
+    @Column(name = "farmerNIC")
+    private String farmerNIC;
+
     public Storage() {
+    }
+
+    public String getFarmerNIC() {
+        return farmerNIC;
+    }
+
+    public void setFarmerNIC(String farmerNIC) {
+        this.farmerNIC = farmerNIC;
     }
 
     public int getStorageID() {

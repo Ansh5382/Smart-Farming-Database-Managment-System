@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/farmer")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 public class FarmerController {
 
     @Autowired
@@ -23,9 +23,10 @@ public class FarmerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFarmer);
     }
 
-    @GetMapping("/getAll")
-    public List<Farmer> getAllFarmers(){
-        return farmerService.getAllFarmers();
+
+    @GetMapping("/byOwner/{ownerNIC}")
+    public List<Farmer> getFarmersByOwner(@PathVariable String ownerNIC) {
+        return farmerService.getFarmersByOwner(ownerNIC);
     }
 
     @PostMapping("/login")
@@ -46,6 +47,26 @@ public class FarmerController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(@RequestBody Map<String, String> deleteData) {
+        String nic = deleteData.get("nic");
+        String password = deleteData.get("password");
+        return farmerService.deleteFarmer(nic, password);
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> data) {
+        String nic = data.get("nic");
+        String currentPassword = data.get("currentPassword");
+        String newPassword = data.get("newPassword");
+        return farmerService.changePassword(nic, currentPassword, newPassword);
+    }
+
+    @PutMapping("/updateProfile/{nic}")
+    public ResponseEntity<Farmer> updateProfile(@PathVariable String nic, @RequestBody Farmer updatedFields) {
+        return farmerService.updateProfile(nic, updatedFields);
     }
 
 }

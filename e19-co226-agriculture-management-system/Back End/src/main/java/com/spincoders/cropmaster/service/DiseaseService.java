@@ -9,4 +9,5 @@ public interface DiseaseService {
     public Disease saveDisease(Disease disease);
     public List<Disease> getAllDisease();
 
+    public List<Disease> getDiseaseByFarmer(String farmerNIC);
 }

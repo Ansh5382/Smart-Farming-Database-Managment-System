@@ -23,4 +23,9 @@ public class IrrigationImplementation implements IrrigationService{
     public List<Irrigation> getAllIrrigation() {
         return irrigationRepositary.findAll();
     }
+
+    @Override
+    public List<Irrigation> getIrrigationByFarmer(String farmerNIC) {
+        return irrigationRepositary.findByFarmerNIC(farmerNIC);
+    }
 }

@@ -35,6 +35,7 @@ const SignupFarmer = () => {
     const [age, setAge] = useState('');
     const [experience, setExperience] = useState('');
     const [mobile, setMobile] = useState('');
+    const [ownerNIC, setOwnerNIC] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [generatedSQL, setGeneratedSQL] = useState('');
     const [showSQL, setShowSQL] = useState(false);
@@ -76,7 +77,7 @@ const SignupFarmer = () => {
         maxWidth: '600px',
         width: '100%',
         border: '3px solid',
-        borderImage: 'linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6) 1',
+        borderImage: 'linear-gradient(135deg, #52796f, #84a98c, #cad2c5) 1',
         position: 'relative',
         zIndex: 1,
     };
@@ -86,10 +87,10 @@ const SignupFarmer = () => {
             backgroundColor: '#ffffff',
             borderRadius: '12px',
             '&:hover fieldset': {
-                borderColor: '#10b981',
+                borderColor: '#52796f',
             },
             '&.Mui-focused fieldset': {
-                borderColor: '#10b981',
+                borderColor: '#52796f',
                 borderWidth: '2px',
             },
             '& fieldset': {
@@ -101,13 +102,13 @@ const SignupFarmer = () => {
             color: '#64748b',
             fontWeight: 600,
             '&.Mui-focused': {
-                color: '#10b981',
+                color: '#52796f',
             },
         },
     };
 
     const buttonStyle = {
-        background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%)',
+        background: 'linear-gradient(135deg, #52796f 0%, #84a98c 50%, #cad2c5 100%)',
         color: 'white',
         padding: '16px 32px',
         fontSize: '16px',
@@ -118,22 +119,22 @@ const SignupFarmer = () => {
         boxShadow: '0 10px 25px rgba(59, 130, 246, 0.4)',
         transition: 'all 0.3s ease',
         '&:hover': {
-            background: 'linear-gradient(135deg, #059669 0%, #2563eb 50%, #7c3aed 100%)',
+            background: 'linear-gradient(135deg, #52796f 0%, #84a98c 50%, #cad2c5 100%)',
             boxShadow: '0 15px 35px rgba(59, 130, 246, 0.5)',
             transform: 'translateY(-2px)',
         },
     };
 
     const handleSignUp = async () => {
-        if (!nic || !name || !password || !age) {
-            setErrorMessage('All required fields must be filled.');
+        if (!nic || !name || !password || !age || !ownerNIC) {
+            setErrorMessage('All required fields including Owner NIC must be filled.');
             setErrorSnackbarOpen(true);
             return;
         }
 
         // Generate SQL query for DBMS project demonstration
-        const sqlQuery = `INSERT INTO farmer (nic, password, name, age, experince, mobile) 
-VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '${mobile || 'NULL'}');`;
+        const sqlQuery = `INSERT INTO farmer (nic, password, name, age, experince, mobile, ownerNIC) 
+VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '${mobile || 'NULL'}', '${ownerNIC}');`;
         
         setGeneratedSQL(sqlQuery);
         setShowSQL(true);
@@ -151,6 +152,7 @@ VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '
                     age: parseInt(age),
                     experince: experience,
                     mobile: mobile,
+                    ownerNIC: ownerNIC,
                 }),
             });
 
@@ -192,7 +194,7 @@ VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '
                     <AgricultureIcon 
                         sx={{ 
                             fontSize: 56, 
-                            color: '#10b981',
+                            color: '#52796f',
                         }} 
                     />
                     <Typography 
@@ -244,7 +246,7 @@ VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <BadgeIcon sx={{ color: '#10b981', fontSize: 24 }} />
+                                            <BadgeIcon sx={{ color: '#52796f', fontSize: 24 }} />
                                         </InputAdornment>
                                     ),
                                 }}
@@ -267,6 +269,27 @@ VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '
                                         </InputAdornment>
                                     ),
                                 }}
+                            />
+                        </Grid>
+
+                        {/* Owner NIC - Mandatory Linkage */}
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Workplace Identity (Owner NIC)"
+                                required
+                                fullWidth
+                                placeholder="Enter your Employer's NIC"
+                                value={ownerNIC}
+                                onChange={(e) => setOwnerNIC(e.target.value)}
+                                sx={textFieldStyle}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <BadgeIcon sx={{ color: '#ef4444', fontSize: 24 }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                helperText="Ask your owner for their NIC to link your account."
                             />
                         </Grid>
 
@@ -378,15 +401,15 @@ VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '
                             onClick={() => setShowSQL(!showSQL)}
                             sx={{
                                 width: '100%',
-                                color: '#10b981',
-                                borderColor: '#10b981',
+                                color: '#52796f',
+                                borderColor: '#52796f',
                                 borderWidth: '2px',
                                 fontWeight: 600,
                                 padding: '12px',
                                 borderRadius: '12px',
                                 textTransform: 'none',
                                 '&:hover': {
-                                    borderColor: '#059669',
+                                    borderColor: '#354f52',
                                     borderWidth: '2px',
                                     backgroundColor: 'rgba(16, 185, 129, 0.05)',
                                 },
@@ -406,7 +429,7 @@ VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '
                             <Link 
                                 to="/" 
                                 style={{ 
-                                    color: '#10b981', 
+                                    color: '#52796f', 
                                     textDecoration: 'none',
                                     fontWeight: 700,
                                 }}
@@ -427,7 +450,7 @@ VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '
                             background: '#1e293b',
                             padding: '24px',
                             borderRadius: '20px',
-                            border: '2px solid #10b981',
+                            border: '2px solid #52796f',
                             position: 'relative',
                         }}
                     >
@@ -435,7 +458,7 @@ VALUES ('${nic}', '${password}', '${name}', ${age}, '${experience || 'NULL'}', '
                             <Typography 
                                 variant="h6" 
                                 sx={{ 
-                                    color: '#10b981',
+                                    color: '#52796f',
                                     fontWeight: 700,
                                     fontFamily: 'monospace',
                                     display: 'flex',

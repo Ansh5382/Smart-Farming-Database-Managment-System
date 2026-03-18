@@ -1,347 +1,168 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, Divider, Typography, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemText } from '@mui/material';
+import React, { useState } from 'react';
+import { 
+    Box, Button, Typography, Dialog, DialogTitle, DialogContent, 
+    Stack, IconButton, useTheme, Grid, Paper, Chip
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import OpacityIcon from '@mui/icons-material/Opacity';
+import LandscapeIcon from '@mui/icons-material/Landscape';
+import CoronavirusIcon from '@mui/icons-material/Coronavirus';
+import ScienceIcon from '@mui/icons-material/Science';
+import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 
-const FarmlandDetailsCard = ({ farmlands }) => {
-    const [selectedFarmland, setSelectedFarmland] = useState(null);
-    const [weatherData, setWeatherData] = useState(null);
-    const [soilData, setSoilData] = useState(null);
-    const [openWeatherDialog, setOpenWeatherDialog] = useState(false);
-    const [openSoilDialog, setOpenSoilDialog] = useState(false);
-    const [diseaseData, setDiseaseData] = useState(null);
-    const [chemicalData, setChemicalData] = useState(null);
-    const [openDiseaseDialog, setOpenDiseaseDialog] = useState(false);
-    const [openChemicalDialog, setOpenChemicalDialog] = useState(false);
-    const [machineData, setMachineData] = useState(null);
-    const [openMachineDialog, setOpenMachineDialog] = useState(false);
+const FarmlandDetailsCard = ({ 
+    farmlands, 
+    selectedFarmland, 
+    setSelectedFarmland,
+    weatherData,
+    soilData,
+    diseaseData,
+    chemicalData,
+    machineData
+}) => {
+    const theme = useTheme();
+    
+    // Dialog states
+    const [openDialog, setOpenDialog] = useState(null); // 'weather', 'soil', 'disease', 'chemical', 'machine'
 
+    const ModernDialogTitle = ({ title }) => (
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1, borderBottom: `1px solid ${theme.palette.divider}` }}>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>{title}</Typography>
+            <IconButton onClick={() => setOpenDialog(null)} size="small"><CloseIcon /></IconButton>
+        </DialogTitle>
+    );
 
-    const cardStyle = { padding: '20px 30px', width: '500', margin: '0px auto',backgroundColor: 'rgb(200, 200, 200)'};
-    const card2Style = {  width: '500',backgroundColor: 'rgba(1, 32, 93, 0.5)' ,};
-
-    const listItemStyles = {
-        borderBottom: '1px solid #ccc',
-        padding: '10px 0',
-        fontSize: '16px',
-    };
-
-    useEffect(() => {
-        // Fetch weather data
-        if (selectedFarmland) {
-            fetch(`http://localhost:8080/weather/getDetails/${selectedFarmland.farmlandID}`)
-                .then((response) => response.json())
-                .then((data) => setWeatherData(data))
-                .catch((error) => console.error('Error fetching weather data:', error));
-
-            // Fetch soil data
-            fetch(`http://localhost:8080/soil/getDetails/${selectedFarmland.farmlandID}`)
-                .then((response) => response.json())
-                .then((data) => setSoilData(data))
-                .catch((error) => console.error('Error fetching soil data:', error));
-
-            fetch(`http://localhost:8080/hostcrop/getDisease/${selectedFarmland.farmlandID}`)
-                .then((response) => response.json())
-                .then((data) => setDiseaseData(data))
-                .catch((error) => console.error('Error fetching soil data:', error));
-
-            fetch(`http://localhost:8080/chemicalusage/getChemical/${selectedFarmland.farmlandID}`)
-                .then((response) => response.json())
-                .then((data) => setChemicalData(data))
-                .catch((error) => console.error('Error fetching soil data:', error));
-
-            fetch(`http://localhost:8080/machineryusage/getMachinery/${selectedFarmland.farmlandID}`)
-                .then((response) => response.json())
-                .then((data) => setMachineData(data))
-                .catch((error) => console.error('Error fetching soil data:', error));
-        }
-    }, [selectedFarmland]);
-
-    const handleOpenWeatherDialog = () => {
-        setOpenWeatherDialog(true);
-    };
-
-    const handleCloseWeatherDialog = () => {
-        setOpenWeatherDialog(false);
-    };
-
-    const handleOpenSoilDialog = () => {
-        setOpenSoilDialog(true);
-    };
-
-    const handleCloseSoilDialog = () => {
-        setOpenSoilDialog(false);
-    };
-
-    const handleOpenDiseaseDialog = () => {
-        setOpenDiseaseDialog(true);
-    };
-
-    const handleCloseDiseaseDialog = () => {
-        setOpenDiseaseDialog(false);
-    };
-
-    const handleOpenChemicalDialog = () => {
-        setOpenChemicalDialog(true);
-    };
-
-    const handleCloseChemicalDialog = () => {
-        setOpenChemicalDialog(false);
-    };
-
-    const handleOpenMachineDialog = () => {
-        setOpenMachineDialog(true);
-    };
-
-    const handleCloseMachineDialog = () => {
-        setOpenMachineDialog(false);
-    };
+    const DetailRow = ({ label, value }) => (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>{label}</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>{value}</Typography>
+        </Box>
+    );
 
     return (
-        <div  style={{ padding: '10px' }}>
-            <Typography variant="h4" align="center" gutterBottom style={{ fontWeight: 'bold', color: 'rgba(1, 32, 93,1)', padding:'10px'}}>
-                FARMLAND DETAILS
-            </Typography>
-            <Divider />
+        <Box>
             {selectedFarmland && (
-                <div style={{ ...cardStyle, margin: '10px', padding: '20px', backgroundColor: 'rgba(1, 32, 93, 0.4)', borderRadius: '10px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)' }}>
-                    <Typography variant="h5" align="center" gutterBottom style={{ fontWeight: 'bold', color: '#fff', padding:'10px'}}>
-                        <p style={{ fontSize: '25px', fontWeight: 'bold', fontStyle: 'italic', color: '#000' }}>
-                            Selected Farmland: {selectedFarmland.name}
-                        </p>
-                    </Typography>
-                    <div style={{ textAlign: 'center' }}>
-                        <Button
-                            variant="contained"
-                            onClick={handleOpenWeatherDialog}
-                            sx={{ ml: 3 ,backgroundColor: 'rgba(1, 32, 93, 0.6)'}}
-
-                        >
-                            WEATHER DATA
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={handleOpenSoilDialog}
-                            sx={{ ml: 3 ,backgroundColor: 'rgba(1, 32, 93, 0.6)'}}
-
-                        >
-                            SOIL DATA
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={handleOpenDiseaseDialog}
-                            sx={{ ml: 3 ,backgroundColor: 'rgba(1, 32, 93, 0.6)'}}
-
-                        >
-                            REPORTED DISEASE
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={handleOpenChemicalDialog}
-                            sx={{ ml: 3 ,backgroundColor: 'rgba(1, 32, 93, 0.6)'}}
-
-                        >
-                            USED CHEMICALS
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={handleOpenMachineDialog}
-                            sx={{ ml: 3 ,backgroundColor: 'rgba(1, 32, 93, 0.6)'}}
-
-                        >
-                            USED MACHINERY
-                        </Button>
-                    </div>
-                </div>
+                <Paper sx={{ mb: 4, p: 3, borderRadius: 4, bgcolor: `${theme.palette.primary.main}10`, border: `1px solid ${theme.palette.primary.main}40` }}>
+                    <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems="center" spacing={3}>
+                        <Box>
+                            <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                Selected Asset
+                            </Typography>
+                            <Typography variant="h4" sx={{ fontWeight: 800, mt: 0.5, color: 'text.primary' }}>
+                                {selectedFarmland.name}
+                            </Typography>
+                        </Box>
+                        
+                        <Stack direction="row" flexWrap="wrap" gap={1} justifyContent="flex-end">
+                            <Button variant="contained" color="info" startIcon={<OpacityIcon />} onClick={() => setOpenDialog('weather')} sx={{ borderRadius: 2 }}>Weather</Button>
+                            <Button variant="contained" color="success" startIcon={<LandscapeIcon />} onClick={() => setOpenDialog('soil')} sx={{ borderRadius: 2 }}>Soil</Button>
+                            <Button variant="contained" color="error" startIcon={<CoronavirusIcon />} onClick={() => setOpenDialog('disease')} sx={{ borderRadius: 2 }}>Diseases</Button>
+                            <Button variant="contained" color="warning" startIcon={<ScienceIcon />} onClick={() => setOpenDialog('chemical')} sx={{ borderRadius: 2 }}>Chemicals</Button>
+                            <Button variant="contained" color="secondary" startIcon={<PrecisionManufacturingIcon />} onClick={() => setOpenDialog('machine')} sx={{ borderRadius: 2 }}>Machinery</Button>
+                        </Stack>
+                    </Stack>
+                </Paper>
             )}
-            <Divider/>
-            <Divider/>
-            <Divider/>
-            <Divider/>
-            <Divider/>
 
-            {farmlands.map((farmland) => (
-                <div style={{ ...cardStyle, margin: '10px', padding: '20px', backgroundColor: 'rgba(1, 32, 93, 0.4)', borderRadius: '10px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)' }} key={farmland.farmlandID}>
-                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                        Farmland ID: {farmland.farmlandID}
-                    </Typography>
-                    <Typography variant="h5" style={{ marginBottom: '10px', color: '#fff' }}>{farmland.name}</Typography>
-                    <Typography style={{ marginBottom: '5px', color: '#fff' }}>Size: {farmland.size}</Typography>
-                    <Typography style={{ marginBottom: '10px', color: '#fff' }}>Location: {farmland.location}</Typography>
-                    <Button
-                        variant="contained"
-                        style={{ backgroundColor: '#1976D2', color: '#fff', borderRadius: '5px', boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.2)' }}
-                        onClick={() => setSelectedFarmland(farmland)}
-                    >
-                        View Details
-                    </Button>
-                </div>
+            <Grid container spacing={3}>
+                {(Array.isArray(farmlands) ? farmlands : []).map((farmland, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={farmland.farmlandID}>
+                        <Paper sx={{ 
+                            p: 3, 
+                            borderRadius: '20px', 
+                            border: `1px solid ${theme.palette.divider}`,
+                            transition: 'all 0.2s ease',
+                            cursor: 'pointer',
+                            bgcolor: selectedFarmland?.farmlandID === farmland.farmlandID ? `${theme.palette.primary.main}05` : 'background.paper',
+                            borderColor: selectedFarmland?.farmlandID === farmland.farmlandID ? 'primary.main' : 'divider',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 12px 24px -8px rgba(0,0,0,0.1)'
+                            }
+                        }} onClick={() => setSelectedFarmland(farmland)}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Chip label={`ID: ${index + 1}`} size="small" sx={{ fontWeight: 700, borderRadius: 1 }} />
+                            </Box>
+                            <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.5 }}>{farmland.name}</Typography>
+                            <Stack spacing={1}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}><strong>Size:</strong> {farmland.size}</Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}><strong>Location:</strong> {farmland.location}</Typography>
+                            </Stack>
+                        </Paper>
+                    </Grid>
+                ))}
+            </Grid>
 
-            ))}
-            <Dialog open={openWeatherDialog} onClose={handleCloseWeatherDialog}>
-                <DialogTitle>
-                    <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                        <b>Weather Data for {selectedFarmland?.name}</b>
-                    </h2>
-                </DialogTitle>
+            {/* Dialogs */}
+            <Dialog open={openDialog === 'weather'} onClose={() => setOpenDialog(null)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title={`Weather Data: ${selectedFarmland?.name}`} />
                 <DialogContent>
                     {weatherData ? (
-                        <List>
-                            <ListItem style={listItemStyles}>
-                                <ListItemText primary={`Temperature: ${weatherData.temperature}`} />
-                            </ListItem>
-                            <ListItem style={listItemStyles}>
-                                <ListItemText primary={`Humidity: ${weatherData.humidity}`} />
-                            </ListItem>
-                            <ListItem style={listItemStyles}>
-                                <ListItemText primary={`Wind Speed: ${weatherData.windspeed}`} />
-                            </ListItem>
-                            <ListItem style={listItemStyles}>
-                                <ListItemText primary={`Rainfall: ${weatherData.rainfall}`} />
-                            </ListItem>
-                            <ListItem style={{ padding: '10px 0', fontSize: '16px' }}>
-                                <ListItemText primary={`Radiation: ${weatherData.radiation}`} />
-                            </ListItem>
-                        </List>
-
-                    ) : (
-                        <Typography>No weather data available.</Typography>
-                    )}
+                        <Stack spacing={0} sx={{ mt: 1 }}>
+                            <DetailRow label="Temperature" value={weatherData.temperature} />
+                            <DetailRow label="Humidity" value={weatherData.humidity} />
+                            <DetailRow label="Wind Speed" value={weatherData.windspeed} />
+                            <DetailRow label="Rainfall" value={weatherData.rainfall} />
+                            <DetailRow label="Radiation" value={weatherData.radiation} />
+                        </Stack>
+                    ) : <Typography align="center" color="text.secondary" py={4}>No data available</Typography>}
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseWeatherDialog} color="primary">
-                        Close
-                    </Button>
-                </DialogActions>
             </Dialog>
 
-            {/* Soil Data Dialog */}
-            <Dialog open={openSoilDialog} onClose={handleCloseSoilDialog}>
-                <DialogTitle>
-                    <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                        <b>Soil Data for {selectedFarmland?.name}</b>
-                    </h2>
-                </DialogTitle>
+            <Dialog open={openDialog === 'soil'} onClose={() => setOpenDialog(null)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title={`Soil Conditions: ${selectedFarmland?.name}`} />
                 <DialogContent>
                     {soilData ? (
-                        <List>
-                            <ListItem style={{ borderBottom: '1px solid #ccc', padding: '10px 0', fontSize: '16px' }}>
-                                <ListItemText primary={`Temperature: ${soilData.temperature}`} />
-                            </ListItem>
-                            <ListItem style={{ borderBottom: '1px solid #ccc', padding: '10px 0', fontSize: '16px' }}>
-                                <ListItemText primary={`pH: ${soilData.ph}`} />
-                            </ListItem>
-                            <ListItem style={{ borderBottom: '1px solid #ccc', padding: '10px 0', fontSize: '16px' }}>
-                                <ListItemText primary={`Structure: ${soilData.structure}`} />
-                            </ListItem>
-                            <ListItem style={{ borderBottom: '1px solid #ccc', padding: '10px 0', fontSize: '16px' }}>
-                                <ListItemText primary={`Water Holding: ${soilData.waterholding}`} />
-                            </ListItem>
-                            <ListItem style={{ padding: '10px 0', fontSize: '16px' }}>
-                                <ListItemText primary={`Nutrition: ${soilData.nutrition}`} />
-                            </ListItem>
-                        </List>
-
-                    ) : (
-                        <Typography>No soil data available.</Typography>
-                    )}
+                        <Stack spacing={0} sx={{ mt: 1 }}>
+                            <DetailRow label="Temperature" value={soilData.temperature} />
+                            <DetailRow label="pH Level" value={soilData.ph} />
+                            <DetailRow label="Structure" value={soilData.structure} />
+                            <DetailRow label="Water Holding" value={soilData.waterholding} />
+                            <DetailRow label="Nutrition" value={soilData.nutrition} />
+                        </Stack>
+                    ) : <Typography align="center" color="text.secondary" py={4}>No data available</Typography>}
                 </DialogContent>
-                <DialogActions >
-                    <Button onClick={handleCloseSoilDialog} color="primary">
-                        Close
-                    </Button>
-                </DialogActions>
             </Dialog>
 
-            <Dialog open={openDiseaseDialog} onClose={handleCloseDiseaseDialog}>
-                <DialogTitle>
-                    <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                        <b>Reported Diseases for {selectedFarmland?.name}</b>
-                    </h2>
-                </DialogTitle>
+            <Dialog open={openDialog === 'disease'} onClose={() => setOpenDialog(null)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title={`Reported Diseases: ${selectedFarmland?.name}`} />
                 <DialogContent>
-                    {diseaseData ? (
-                        <List>
-                            {diseaseData && diseaseData.map((disease, index) => (
-                                <ListItem style={listItemStyles} key={index}>
-                                    <ListItemText primary={`Disease Name: ${disease.diseaseName}`} />
-                                    <ListItemText primary={`Reporter NIC: ${disease.nic}`} />
-                                    <ListItemText primary={`Reported Date: ${disease.date}`} />
-                                </ListItem>
-                            ))}
-                        </List>
-
-
-                    ) : (
-                        <Typography>No disease data available.</Typography>
-                    )}
+                    {diseaseData?.length > 0 ? diseaseData.map((d, i) => (
+                        <Box key={i} sx={{ mb: 3, p: 2, bgcolor: 'background.default', borderRadius: 2, mt: 1 }}>
+                            <DetailRow label="Disease" value={d.diseaseName} />
+                            <DetailRow label="Reporter NIC" value={d.nic} />
+                            <DetailRow label="Date" value={new Date(d.date).toLocaleDateString()} />
+                        </Box>
+                    )) : <Typography align="center" color="text.secondary" py={4}>No diseases reported</Typography>}
                 </DialogContent>
-                <DialogActions >
-                    <Button onClick={handleCloseDiseaseDialog} color="primary">
-                        Close
-                    </Button>
-                </DialogActions>
             </Dialog>
 
-            <Dialog open={openChemicalDialog} onClose={handleCloseChemicalDialog}>
-                <DialogTitle>
-                    <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                        <b>Used Chemical for {selectedFarmland?.name}</b>
-                    </h2>
-                </DialogTitle>
+            <Dialog open={openDialog === 'chemical'} onClose={() => setOpenDialog(null)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title={`Chemical Usage: ${selectedFarmland?.name}`} />
                 <DialogContent>
-                    {chemicalData ? (
-                        <List>
-                            {chemicalData && chemicalData.map((chemical, index) => (
-                                <ListItem style={listItemStyles} key={index}>
-                                    <ListItemText primary={`Chemical Name: ${chemical.chemicalName}`} />
-                                    <ListItemText primary={`User NIC: ${chemical.nic}`} />
-                                    <ListItemText primary={`Used Date: ${chemical.date}`} />
-                                </ListItem>
-                            ))}
-                        </List>
-
-
-                    ) : (
-                        <Typography>No chemical data available.</Typography>
-                    )}
+                    {chemicalData?.length > 0 ? chemicalData.map((c, i) => (
+                        <Box key={i} sx={{ mb: 3, p: 2, bgcolor: 'background.default', borderRadius: 2, mt: 1 }}>
+                            <DetailRow label="Chemical" value={c.chemicalName} />
+                            <DetailRow label="User NIC" value={c.nic} />
+                            <DetailRow label="Date" value={new Date(c.date).toLocaleDateString()} />
+                        </Box>
+                    )) : <Typography align="center" color="text.secondary" py={4}>No chemicals used</Typography>}
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseChemicalDialog} color="primary">
-                        Close
-                    </Button>
-                </DialogActions>
             </Dialog>
 
-            <Dialog open={openMachineDialog} onClose={handleCloseMachineDialog}>
-                <DialogTitle>
-                    <h2 style={{ borderBottom: '2px solid #000', paddingBottom: '8px' }}>
-                        <b>Machine Data for {selectedFarmland?.name}</b>
-                    </h2>
-                </DialogTitle>
+            <Dialog open={openDialog === 'machine'} onClose={() => setOpenDialog(null)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <ModernDialogTitle title={`Machinery Usage: ${selectedFarmland?.name}`} />
                 <DialogContent>
-                    {machineData ? (
-                        <List>
-                            {machineData && machineData.map((machine, index) => (
-                                <ListItem style={listItemStyles} key={index}>
-                                    <ListItemText primary={`Machinery Name: ${machine.machineryName}`} />
-                                    <ListItemText primary={`User NIC: ${machine.nic}`} />
-                                    <ListItemText primary={`Used Date: ${machine.date}`} />
-                                </ListItem>
-                            ))}
-                        </List>
-
-
-                    ) : (
-                        <Typography>No machine data available.</Typography>
-                    )}
+                    {machineData?.length > 0 ? machineData.map((m, i) => (
+                        <Box key={i} sx={{ mb: 3, p: 2, bgcolor: 'background.default', borderRadius: 2, mt: 1 }}>
+                            <DetailRow label="Machinery" value={m.machineryName} />
+                            <DetailRow label="User NIC" value={m.nic} />
+                            <DetailRow label="Date" value={new Date(m.date).toLocaleDateString()} />
+                        </Box>
+                    )) : <Typography align="center" color="text.secondary" py={4}>No machinery used</Typography>}
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseMachineDialog} color="primary">
-                        Close
-                    </Button>
-                </DialogActions>
             </Dialog>
-
-        </div>
+        </Box>
     );
 };
 

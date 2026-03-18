@@ -1,7 +1,31 @@
 html, body, #root {
     height: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #fdfcf0;
 }
 
 canvas {
     width: 100% !important;
+}
+
+/* Custom Scrollbar - Adaptive */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(132, 169, 140, 0.4);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(82, 121, 111, 0.7);
 }

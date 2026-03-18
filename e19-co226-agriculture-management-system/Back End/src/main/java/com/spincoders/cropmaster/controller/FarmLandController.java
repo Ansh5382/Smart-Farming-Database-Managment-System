@@ -1,6 +1,5 @@
 package com.spincoders.cropmaster.controller;
 
-import com.spincoders.cropmaster.model.Farmer;
 import com.spincoders.cropmaster.model.Farmland;
 import com.spincoders.cropmaster.service.FarmLandService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/farmland")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 public class FarmLandController {
 
     @Autowired
@@ -22,24 +21,35 @@ public class FarmLandController {
         return "New FarmLand is added";
     }
 
-    @GetMapping("/getAll")
-    public List<Farmland> getAllFarmLands(){
-        return farmLandService.getAllFarmLand();
+
+    @GetMapping("/croped/{nic}/{ownerNIC}")
+    public List<Farmland> getCropedFarmlands(@PathVariable String nic, @PathVariable String ownerNIC) {
+        return farmLandService.getCropFarmland(nic, ownerNIC);
     }
 
-    @GetMapping("/croped/{nic}")
-    public List<Farmland> getCropedFarmlands(@PathVariable String nic) {
-        return farmLandService.getCropFarmland(nic);
+    @GetMapping("/getAll/{nic}/{ownerNIC}")
+    public List<Farmland> getFarmlandByNic(@PathVariable String nic, @PathVariable String ownerNIC) {
+        return farmLandService.getFarmlandByNic(nic, ownerNIC);
     }
 
-    @GetMapping("/getAll/{nic}")
-    public List<Farmland> getFarmlandByNic(@PathVariable String nic) {
-        return farmLandService.getFarmlandByNic(nic);
+    @GetMapping("/byOwner/{ownerNIC}")
+    public List<Farmland> getFarmlandsByOwner(@PathVariable String ownerNIC) {
+        return farmLandService.getFarmlandsByOwner(ownerNIC);
     }
 
-    @GetMapping("/uncroped/{nic}")
-    public List<Farmland> getUncropedFarmlands(@PathVariable String nic) {
-        return farmLandService.getUncropFarmland(nic);
+    @GetMapping("/uncroped/{nic}/{ownerNIC}")
+    public List<Farmland> getUncropedFarmlands(@PathVariable String nic, @PathVariable String ownerNIC) {
+        return farmLandService.getUncropFarmland(nic, ownerNIC);
+    }
+
+    @GetMapping("/noNicByOwner/{ownerNIC}")
+    public List<Farmland> getFarmlandNoNicByOwner(@PathVariable String ownerNIC) {
+        return farmLandService.getFarmlandNoNicByOwner(ownerNIC);
+    }
+
+    @GetMapping("/nicByOwner/{ownerNIC}")
+    public List<Farmland> getFarmlandNicByOwner(@PathVariable String ownerNIC) {
+        return farmLandService.getFarmlandNicByOwner(ownerNIC);
     }
 
     @PutMapping("/updateCrop/{farmlandId}/{cropId}")
@@ -67,15 +77,6 @@ public class FarmLandController {
         return farmLandService.updateFarmer(farmlandId, farmerNic);
     }
 
-    @GetMapping("/noNic")
-    public List<Farmland> getFarmlandNoNic() {
-        return farmLandService.getFarmlandNoNic();
-    }
-
-    @GetMapping("/nic")
-    public List<Farmland> getFarmlandNic() {
-        return farmLandService.getFarmlandNic();
-    }
 
     @GetMapping("getCrop/{farmlandId}")
     public int getFarmlandCropID(@PathVariable int farmlandId) {

@@ -27,4 +27,9 @@ public class ChemicalController {
         return chemicalService.getAllChemical();
     }
 
+    @GetMapping("/byFarmer/{farmerNIC}")
+    public List<Chemical> getByFarmer(@PathVariable String farmerNIC) {
+        return chemicalService.getChemicalByFarmer(farmerNIC);
+    }
+
 }

@@ -11,5 +11,7 @@ public interface CropService {
 
     public List<Crop> getAllCrop();
 
+    public List<Crop> getCropsByFarmer(String farmerNIC);
+
     public Optional<Crop> getCropByID(int cropID);
 }

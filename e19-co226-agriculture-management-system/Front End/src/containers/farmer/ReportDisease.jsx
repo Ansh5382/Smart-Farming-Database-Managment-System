@@ -4,6 +4,7 @@ import {
     Paper, TextField, InputLabel, FormControl, Stack, Alert, 
     Snackbar, CircularProgress, IconButton, Divider, Grid
 } from '@mui/material';
+import { motion } from 'framer-motion';
 import { useNic } from "../../components/NicContext.jsx";
 import { 
     ChevronLeft, 
@@ -13,11 +14,22 @@ import {
 } from '@mui/icons-material';
 
 // --- CropMaster Theme Palette ---
-const BG_CREME = '#FDFCF8';        
-const SAGE_DARK = '#2C3E35';       
-const SAGE_LIGHT = '#F4F7F5';      
-const BORDER_COLOR = '#E5E2D9';    
+const BG_CREME = '#fffdf2';        
+const SAGE_DARK = '#0f172a';       
+const SAGE_LIGHT = '#fdfcf0';      
+const BORDER_COLOR = '#cad2c5';    
 const ACCENT_RED = '#C0392B'; // Disease/Warning accent
+
+// --- Animations ---
+const containerParams = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemParams = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
 
 const inputStyle = {
     '& .MuiOutlinedInput-root': {
@@ -51,11 +63,17 @@ export default function ReportDisease() {
 
     const fetchData = async () => {
         try {
+            // First get farmer's owner context
+            const resProfile = await fetch(`http://localhost:8080/farmer/${nic}`);
+            if (!resProfile.ok) throw new Error("Could not fetch profile");
+            const profile = await resProfile.json();
+            const ownerNIC = profile.ownerNIC;
+
             const [resFarm, resDisease] = await Promise.all([
-                fetch(`http://localhost:8080/farmland/getAll/${nic}`),
-                fetch('http://localhost:8080/disease/getAll')
+                fetch(`http://localhost:8080/farmland/getAll/${nic}/${ownerNIC}`),
+                fetch(`http://localhost:8080/disease/byFarmer/${nic}`)
             ]);
-            if (resFarm.ok) setFarmlandData(await resFarm.ok ? await resFarm.json() : []);
+            if (resFarm.ok) setFarmlandData(await resFarm.json());
             if (resDisease.ok) setDiseaseData(await resDisease.json());
         } catch (error) { console.error("Fetch Error:", error); }
     };
@@ -70,7 +88,7 @@ export default function ReportDisease() {
             const response = await fetch('http://localhost:8080/disease/addNew', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, type, symptom, transmission }),
+                body: JSON.stringify({ name, type, symptom, transmission, farmerNIC: nic }),
             });
             if (response.ok) {
                 showNotify('New disease registered in database', 'success');
@@ -108,10 +126,10 @@ export default function ReportDisease() {
     };
 
     return (
-        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK }}>
+        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK, overflowX: 'hidden' }}>
             
             {/* Top Navigation */}
-            <Box sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
+            <Box component={motion.div} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <IconButton size="small" sx={{ border: `1px solid ${BORDER_COLOR}` }} onClick={() => window.history.back()}>
                         <ChevronLeft />
@@ -125,11 +143,11 @@ export default function ReportDisease() {
                 </Typography>
             </Box>
 
-            <Container maxWidth="lg" sx={{ mt: 6 }}>
+            <Container maxWidth="lg" sx={{ mt: 6 }} component={motion.div} variants={containerParams} initial="hidden" animate="show">
                 <Grid container spacing={4}>
                     
                     {/* Left: Register New Disease */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>Disease Registry</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>Add unidentified pathogens to the global database.</Typography>
@@ -148,7 +166,7 @@ export default function ReportDisease() {
                                     disabled={loading}
                                     fullWidth
                                     startIcon={<Biotech />}
-                                    sx={{ bgcolor: SAGE_DARK, color: '#fff', py: 2, borderRadius: '12px', fontWeight: 700, textTransform: 'none', '&:hover': { bgcolor: '#1a2621' } }}
+                                    sx={{ bgcolor: SAGE_DARK, color: '#fff', py: 2, borderRadius: '12px', fontWeight: 700, textTransform: 'none', '&:hover': { bgcolor: '#1e293b' } }}
                                 >
                                     {loading ? <CircularProgress size={24} color="inherit" /> : "Register Pathogen"}
                                 </Button>
@@ -157,7 +175,7 @@ export default function ReportDisease() {
                     </Grid>
 
                     {/* Right: Report Incident */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>Incident Reporting</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>Log an active outbreak on your farmland assets.</Typography>

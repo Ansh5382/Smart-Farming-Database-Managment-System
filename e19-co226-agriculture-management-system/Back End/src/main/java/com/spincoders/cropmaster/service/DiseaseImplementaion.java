@@ -22,4 +22,9 @@ public class DiseaseImplementaion implements DiseaseService{
     public List<Disease> getAllDisease() {
         return diseaseRepositary.findAll();
     }
+
+    @Override
+    public List<Disease> getDiseaseByFarmer(String farmerNIC) {
+        return diseaseRepositary.findByFarmerNIC(farmerNIC);
+    }
 }

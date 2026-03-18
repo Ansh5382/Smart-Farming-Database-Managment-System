@@ -34,7 +34,18 @@ public class Farmland {
     @Column(name = "storageID")
     private int storageID;
 
+    @Column(name = "ownerNIC")
+    private String ownerNIC;
+
     public Farmland() {
+    }
+
+    public String getOwnerNIC() {
+        return ownerNIC;
+    }
+
+    public void setOwnerNIC(String ownerNIC) {
+        this.ownerNIC = ownerNIC;
     }
 
     public int getFarmlandID() {

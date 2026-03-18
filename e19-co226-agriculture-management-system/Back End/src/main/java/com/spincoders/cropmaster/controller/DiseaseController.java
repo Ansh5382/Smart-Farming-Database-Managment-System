@@ -27,4 +27,9 @@ public class DiseaseController {
         return diseaseService.getAllDisease();
     }
 
+    @GetMapping("/byFarmer/{farmerNIC}")
+    public List<Disease> getByFarmer(@PathVariable String farmerNIC) {
+        return diseaseService.getDiseaseByFarmer(farmerNIC);
+    }
+
 }

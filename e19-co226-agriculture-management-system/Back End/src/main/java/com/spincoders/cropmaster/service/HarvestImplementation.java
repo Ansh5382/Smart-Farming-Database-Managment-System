@@ -23,4 +23,9 @@ public class HarvestImplementation implements HarvestService{
     public List<Harvest> getAllHarvest() {
         return harvestRepositary.findAll();
     }
+
+    @Override
+    public List<Harvest> getHarvestByFarmer(String farmerNIC) {
+        return harvestRepositary.findByFarmerNIC(farmerNIC);
+    }
 }

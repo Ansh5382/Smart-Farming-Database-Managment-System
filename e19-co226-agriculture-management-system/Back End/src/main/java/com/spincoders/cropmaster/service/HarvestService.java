@@ -9,4 +9,6 @@ public interface HarvestService {
     public Harvest saveHarvest(Harvest harvest);
 
     public List<Harvest> getAllHarvest();
+
+    public List<Harvest> getHarvestByFarmer(String farmerNIC);
 }

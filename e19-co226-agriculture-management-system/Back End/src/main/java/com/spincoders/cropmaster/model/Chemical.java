@@ -29,7 +29,18 @@ public class Chemical {
     @Column(name = "envir_impact")
     private String envir_impact;
 
+    @Column(name = "farmerNIC")
+    private String farmerNIC;
+
     public Chemical() {
+    }
+
+    public String getFarmerNIC() {
+        return farmerNIC;
+    }
+
+    public void setFarmerNIC(String farmerNIC) {
+        this.farmerNIC = farmerNIC;
     }
 
     public int getChemicalID() {

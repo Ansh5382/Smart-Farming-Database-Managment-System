@@ -9,4 +9,6 @@ public interface MachineryService {
     public Machinery saveMachinery(Machinery machinery);
 
     public List<Machinery> getAllMachinery();
+
+    public List<Machinery> getMachineryByFarmer(String farmerNIC);
 }

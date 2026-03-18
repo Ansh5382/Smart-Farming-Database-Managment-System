@@ -24,13 +24,13 @@ public class FarmLandImplementaion implements FarmLandService{
     }
 
     @Override
-    public List<Farmland> getCropFarmland(String nic) {
-        return farmLandRepositary.findCropLand(nic);
+    public List<Farmland> getCropFarmland(String nic, String ownerNIC) {
+        return farmLandRepositary.findCropLand(nic, ownerNIC);
     }
 
     @Override
-    public List<Farmland> getUncropFarmland(String nic) {
-        return farmLandRepositary.findUncropLand(nic);
+    public List<Farmland> getUncropFarmland(String nic, String ownerNIC) {
+        return farmLandRepositary.findUncropLand(nic, ownerNIC);
     }
 
     @Override
@@ -78,8 +78,8 @@ public class FarmLandImplementaion implements FarmLandService{
     }
 
     @Override
-    public List<Farmland> getFarmlandByNic(String nic) {
-        return farmLandRepositary.findFarmlandByFarmer(nic);
+    public List<Farmland> getFarmlandByNic(String nic, String ownerNIC) {
+        return farmLandRepositary.findFarmlandByFarmer(nic, ownerNIC);
     }
 
     @Override
@@ -93,15 +93,6 @@ public class FarmLandImplementaion implements FarmLandService{
         return null;
     }
 
-    @Override
-    public List<Farmland> getFarmlandNoNic() {
-        return farmLandRepositary.findFarmlandNoNic();
-    }
-
-    @Override
-    public List<Farmland> getFarmlandNic() {
-        return farmLandRepositary.findFarmlandNic();
-    }
 
     @Override
     public int getCropID(int farmlandId) {
@@ -111,5 +102,20 @@ public class FarmLandImplementaion implements FarmLandService{
         }else{
             return 0;
         }
+    }
+
+    @Override
+    public List<Farmland> getFarmlandsByOwner(String ownerNIC) {
+        return farmLandRepositary.findByOwnerNIC(ownerNIC);
+    }
+
+    @Override
+    public List<Farmland> getFarmlandNoNicByOwner(String ownerNIC) {
+        return farmLandRepositary.findFarmlandNoNicByOwner(ownerNIC);
+    }
+
+    @Override
+    public List<Farmland> getFarmlandNicByOwner(String ownerNIC) {
+        return farmLandRepositary.findFarmlandNicByOwner(ownerNIC);
     }
 }

@@ -4,6 +4,7 @@ import {
     Paper, TextField, InputLabel, FormControl, Stack, Alert, 
     Snackbar, CircularProgress, IconButton, Divider, Grid, InputAdornment
 } from '@mui/material';
+import { motion } from 'framer-motion';
 import { useNic } from "../../components/NicContext.jsx";
 import { 
     ChevronLeft, 
@@ -14,10 +15,21 @@ import {
 } from '@mui/icons-material';
 
 // --- CropMaster Theme Palette ---
-const BG_CREME = '#FDFCF8';        
-const SAGE_DARK = '#2C3E35';       
-const SAGE_LIGHT = '#F4F7F5';      
-const BORDER_COLOR = '#E5E2D9';    
+const BG_CREME = '#fffdf2';        
+const SAGE_DARK = '#0f172a';       
+const SAGE_LIGHT = '#fdfcf0';      
+const BORDER_COLOR = '#cad2c5';    
+
+// --- Animations ---
+const containerParams = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemParams = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
 
 const inputStyle = {
     '& .MuiOutlinedInput-root': {
@@ -48,9 +60,15 @@ const AddStorageMethod = () => {
 
     const fetchData = async () => {
         try {
+            // First get farmer's owner context
+            const resProfile = await fetch(`http://localhost:8080/farmer/${nic}`);
+            if (!resProfile.ok) throw new Error("Could not fetch profile");
+            const profile = await resProfile.json();
+            const ownerNIC = profile.ownerNIC;
+
             const [resStorage, resLands] = await Promise.all([
-                fetch('http://localhost:8080/storage/getAll'),
-                fetch(`http://localhost:8080/farmland/getAll/${nic}`)
+                fetch(`http://localhost:8080/storage/byFarmer/${nic}`),
+                fetch(`http://localhost:8080/farmland/getAll/${nic}/${ownerNIC}`)
             ]);
             if (resStorage.ok) setStorageMethods(await resStorage.json());
             if (resLands.ok) setFarmlands(await resLands.json());
@@ -71,7 +89,7 @@ const AddStorageMethod = () => {
             const res = await fetch('http://localhost:8080/storage/addNew', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(storageData),
+                body: JSON.stringify({ ...storageData, farmerNIC: nic }),
             });
             if (res.ok) {
                 showNotify('Storage Facility Registered', 'success');
@@ -97,10 +115,10 @@ const AddStorageMethod = () => {
     };
 
     return (
-        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK }}>
+        <Box sx={{ bgcolor: BG_CREME, minHeight: '100vh', pb: 8, color: SAGE_DARK, overflowX: 'hidden' }}>
             
             {/* Minimal Navigation Header */}
-            <Box sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
+            <Box component={motion.div} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${BORDER_COLOR}`, bgcolor: '#fff' }}>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <IconButton size="small" sx={{ border: `1px solid ${BORDER_COLOR}` }} onClick={() => window.history.back()}>
                         <ChevronLeft />
@@ -114,11 +132,11 @@ const AddStorageMethod = () => {
                 </Typography>
             </Box>
 
-            <Container maxWidth="lg" sx={{ mt: 6 }}>
+            <Container maxWidth="lg" sx={{ mt: 6 }} component={motion.div} variants={containerParams} initial="hidden" animate="show">
                 <Grid container spacing={4}>
                     
                     {/* Left side: Add Facility */}
-                    <Grid item xs={12} md={7}>
+                    <Grid item xs={12} md={7} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>Facility Registry</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>Create new storage environments with specific climate controls.</Typography>
@@ -154,7 +172,7 @@ const AddStorageMethod = () => {
                                         disabled={loading}
                                         fullWidth
                                         startIcon={<Warehouse />}
-                                        sx={{ bgcolor: SAGE_DARK, color: '#fff', py: 2, borderRadius: '12px', fontWeight: 700, mt: 1, '&:hover': { bgcolor: '#1a2621' } }}
+                                        sx={{ bgcolor: SAGE_DARK, color: '#fff', py: 2, borderRadius: '12px', fontWeight: 700, mt: 1, '&:hover': { bgcolor: '#1e293b' } }}
                                     >
                                         {loading ? <CircularProgress size={24} color="inherit" /> : "Register Facility"}
                                     </Button>
@@ -164,7 +182,7 @@ const AddStorageMethod = () => {
                     </Grid>
 
                     {/* Right side: Assign Facility */}
-                    <Grid item xs={12} md={5}>
+                    <Grid item xs={12} md={5} component={motion.div} variants={itemParams}>
                         <Box sx={{ mb: 3 }}>
                             <Typography variant="h5" sx={{ fontWeight: 900, mb: 1 }}>Deployment</Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary' }}>Assign assets to storage units.</Typography>
