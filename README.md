@@ -27,6 +27,10 @@
 - 💧 Plan and track irrigation schedules
 - 🚜 Manage machinery & chemical usage
 - 🌾 Record harvest and manage storage
+- 🌿 View soil health insights per farmland
+- 👤 View and edit personal profile details
+- ⚙️ Manage settings (theme, language, password, account)
+- 🎤 Use hands-free voice assistant for navigation
 - 📈 Generate detailed reports (PDF/CSV)
 
 ### 👔 For Farm Owners
@@ -35,6 +39,10 @@
 - 📋 Track overall farm operations & land usage
 - 📊 View comprehensive analytics and activity logs
 - 🎯 Monitor overall farm performance at a glance
+- 👤 View and edit personal profile details
+- ⚙️ Manage settings (theme, language, password, account)
+- 🎤 Use hands-free voice assistant for navigation
+- 📈 Generate reports across all farm records (PDF/CSV)
 
 ---
 
@@ -44,30 +52,33 @@
 ┌─────────────────────────────────────────────────────────┐
 │  FRONTEND                                               │
 ├─────────────────────────────────────────────────────────┤
-│  ⚛️  React + Vite        (Fast, modern SPA)              │
-│  🎨 Material UI          (Polished UI components)        │
-│  🎬 Framer Motion        (Smooth animations)             │
-│  📊 Chart.js             (Data visualization)            │
-│  📄 jsPDF & PapaParse    (PDF & CSV report generation)   │
-│  🌐 i18n                 (Multi-language support)        │
-│  🌙 Theme Switching      (Light / Dark mode)             │
+│  ⚛️  React 18 + Vite 4    (Fast, modern SPA)             │
+│  🎨 Material UI (MUI 5)   (Polished UI components)       │
+│  🎬 Framer Motion         (Smooth animations)            │
+│  📊 Chart.js              (Data visualization)           │
+│  📄 jsPDF & PapaParse     (PDF & CSV report generation)  │
+│  🌐 4-language i18n       (EN / TA / HI / SI)            │
+│  🌙 Theme Switching       (Light / Dark mode)            │
+│  🎤 Voice Assistant       (Browser speech recognition)   │
+│  🌀 Three.js              (3D visual elements)           │
+│  📋 react-pro-sidebar     (Sidebar navigation)           │
 └─────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────┐
 │  BACKEND                                                │
 ├─────────────────────────────────────────────────────────┤
-│  ☕ Java 17 + Spring Boot (Robust REST API server)       │
-│  🔌 Spring Web           (RESTful API endpoints)         │
-│  🔐 jBCrypt              (Secure password encryption)    │
-│  📦 Spring Data JPA      (ORM & database operations)     │
-│  🐘 Hibernate            (Entity mapping & queries)      │
+│  ☕ Java 17 + Spring Boot 3.1.2 (REST API server)        │
+│  🔌 Spring Web            (RESTful API endpoints)        │
+│  🔐 jBCrypt               (Secure password encryption)   │
+│  📦 Spring Data JPA       (ORM & database operations)    │
+│  🐘 Hibernate             (Entity mapping & queries)     │
 └─────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────┐
 │  DATABASE                                               │
 ├─────────────────────────────────────────────────────────┤
-│  🗄️  MySQL 5.7+           (Reliable relational storage)  │
-│  📋 Well-structured schema with 12+ entities            │
+│  🗄️  MySQL 5.7+            (Reliable relational storage) │
+│  📋 Well-structured schema with 15 entities             │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -79,7 +90,8 @@
 Smart-Farming-Database-Management-System/
 ├── 📁 e19-co226-agriculture-management-system/
 │   ├── 📁 Front End/      # React + Vite application
-│   └── 📁 Back End/       # Spring Boot REST API server
+│   ├── 📁 Back End/       # Spring Boot REST API server
+│   └── 📁 docs/           # Technical documentation
 └── 📄 README.md           # Project overview
 ```
 
@@ -119,7 +131,7 @@ mvnw.cmd spring-boot:run
 ```bash
 cd "Front End"
 npm install
-npm run dev
+npm run start
 ```
 🟢 Frontend running at `http://localhost:5173`
 
@@ -136,11 +148,15 @@ npm run dev
 | 🌾 Harvest & Storage | Record yield and storage data | ✅ | — |
 | 🚜 Machinery & Chemicals | Track usage & inventory | ✅ | — |
 | 🌤️ Soil & Weather Data | Log environmental conditions | ✅ | — |
+| 🌿 Soil Health View | Soil health insights per farmland | ✅ | — |
 | 👥 Farmer Management | Add farmers & assign to farmland | — | ✅ |
 | 📊 Analytics Dashboard | View farm performance metrics | — | ✅ |
 | 📄 Report Generation | Export PDF & CSV reports | ✅ | ✅ |
-| 🌐 Multi-Language Support | Switch interface language | ✅ | ✅ |
+| 👤 Profile Management | View & edit personal profile | ✅ | ✅ |
+| ⚙️ Settings | Password, theme & language | ✅ | ✅ |
+| 🌐 Multi-Language Support | EN / Tamil / Hindi / Sinhala | ✅ | ✅ |
 | 🎨 Theme Switching | Light / Dark mode | ✅ | ✅ |
+| 🎤 Voice Assistant | Hands-free navigation commands | ✅ | ✅ |
 
 ---
 
@@ -154,11 +170,14 @@ The `cropmaster` MySQL database contains the following core entities:
 🏞️ Farmland       — Land parcels managed by owners
 🌱 Crop           — Crop records assigned to farmlands
 🦠 Disease        — Plant disease reports & tracking
+🔗 HostCrop       — Disease-to-farmland event logs
 💧 Irrigation     — Irrigation schedules & logs
 🌾 Harvest        — Harvest records per crop
 📦 Storage        — Post-harvest storage details
-🧪 Chemical       — Chemical usage per farmland
-🚜 Machinery      — Equipment usage logs
+🧪 Chemical       — Chemical master records
+📋 ChemicalUsage  — Chemical usage logs per farmland
+🚜 Machinery      — Machinery master records
+🔧 MachineryUsage — Machinery usage logs per farmland
 🌍 Soil           — Soil data per farmland
 🌤️ Weather        — Weather records per farmland
 ```
@@ -172,19 +191,21 @@ All entities are connected via JPA/Hibernate and mapped to the MySQL database.
 The Spring Boot backend exposes a comprehensive set of REST APIs:
 
 ```
-📌 /api/owners          — Create, read, update owner profiles
-👨‍🌾 /api/farmers         — Manage farmer accounts & assignments
-🏞️ /api/farmlands       — CRUD operations on farmland records
-🌱 /api/crops           — Track crops across farmlands
-🦠 /api/diseases        — Report and manage plant diseases
-💧 /api/irrigation      — Schedule and log irrigation events
-🌾 /api/harvest         — Record and query harvest data
-📦 /api/storage         — Manage storage entries
-🧪 /api/chemicals       — Track chemical usage
-🚜 /api/machinery       — Monitor equipment logs
-🌍 /api/soil            — Log soil conditions
-🌤️ /api/weather         — Record weather data
-📊 /api/reports         — Generate agricultural reports
+📌 /owner              — Create, read, update, delete owner profiles
+👨‍🌾 /farmer             — Manage farmer accounts, login & assignments
+🏞️ /farmland           — CRUD operations on farmland records
+🌱 /crop               — Track crops across farmlands
+🦠 /disease            — Report and manage plant diseases
+🔗 /hostcrop           — Log disease events per farmland
+💧 /irrigation         — Schedule and log irrigation events
+🌾 /harvest            — Record and query harvest data
+📦 /storage            — Manage storage entries
+🧪 /chemical           — Manage chemical master records
+📋 /chemicalusage      — Log and query chemical usage per farmland
+🚜 /machinery          — Manage machinery master records
+🔧 /machineryusage     — Log and query machinery usage per farmland
+🌍 /soil               — Log soil conditions per farmland
+🌤️ /weather            — Record weather data per farmland
 ```
 
 ---
