@@ -8,7 +8,7 @@ public interface OwnerService {
 
     public Owner saveOwner(Owner owner);
 
-    public ResponseEntity<String> authenticateOwner(String nic, String password);
+    public ResponseEntity<?> authenticateOwner(String nic, String password);
 
     public Owner findByNic(String nic);
 

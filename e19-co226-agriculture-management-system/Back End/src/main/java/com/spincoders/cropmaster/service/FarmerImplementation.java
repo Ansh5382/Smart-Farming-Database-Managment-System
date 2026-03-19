@@ -1,5 +1,7 @@
 package com.spincoders.cropmaster.service;
 
+import com.spincoders.cropmaster.auth.JwtService;
+import com.spincoders.cropmaster.dto.LoginResponse;
 import com.spincoders.cropmaster.model.Farmer;
 import com.spincoders.cropmaster.repositary.FarmerRepositary;
 import org.mindrot.jbcrypt.BCrypt;
@@ -22,6 +24,9 @@ public class FarmerImplementation implements FarmerService{
     @Autowired
     private FarmLandRepositary farmLandRepositary;
 
+    @Autowired
+    private JwtService jwtService;
+
     @Override
     public Farmer saveFarmer(Farmer farmer) {
         String hashedPassword = BCrypt.hashpw(farmer.getPassword(), BCrypt.gensalt());
@@ -35,7 +40,7 @@ public class FarmerImplementation implements FarmerService{
     }
 
     @Override
-    public ResponseEntity<String> authenticateFarmer(String nic, String password) {
+    public ResponseEntity<?> authenticateFarmer(String nic, String password) {
         Farmer farmer = farmerRepositary.findByNic(nic);
 
         if (farmer == null) {
@@ -43,7 +48,8 @@ public class FarmerImplementation implements FarmerService{
         }
 
         if (BCrypt.checkpw(password, farmer.getPassword())) {
-            return ResponseEntity.ok("{\"message\": \"Login successful for NIC: " + nic + "\"}");
+            String token = jwtService.generateToken(nic, "farmer");
+            return ResponseEntity.ok(new LoginResponse("Login successful", token, nic, "farmer"));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"Wrong password\"}");
         }

@@ -10,6 +10,7 @@ import {
     InputAdornment,
     IconButton,
     Avatar,
+    CircularProgress,
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import { motion } from 'framer-motion';
@@ -36,7 +37,15 @@ const Home = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const { setNic } = useNic();
+    const { setSession, isAuthenticated, role, isLoading } = useNic();
+
+    React.useEffect(() => {
+        if (isLoading || !isAuthenticated) {
+            return;
+        }
+
+        navigate(role === 'owner' ? '/ownerhome' : '/farmerhome', { replace: true });
+    }, [isAuthenticated, navigate, role, isLoading]);
 
     const handleSignIn = async () => {
         if (!nicValue || !password) {
@@ -60,12 +69,8 @@ const Home = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setNic(nicValue);
-                if (userType === 'farmer') {
-                    navigate(`/farmerhome`);
-                } else if (userType === 'owner') {
-                    navigate(`/ownerhome`);
-                }
+                setSession(data);
+                navigate(userType === 'owner' ? '/ownerhome' : '/farmerhome');
             } else {
                 setErrorMessage(data.error || 'Login failed');
                 setErrorSnackbarOpen(true);
@@ -81,6 +86,14 @@ const Home = () => {
         setErrorSnackbarOpen(false);
         setErrorMessage('');
     };
+
+    if (isLoading) {
+        return (
+            <Box sx={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#fff' }}>
+                <CircularProgress color="primary" />
+            </Box>
+        );
+    }
 
     return (
         <Box sx={{

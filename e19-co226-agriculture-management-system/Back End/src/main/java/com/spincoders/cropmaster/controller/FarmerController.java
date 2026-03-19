@@ -30,17 +30,30 @@ public class FarmerController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Map<String, String> loginData) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
         String nic = loginData.get("nic");
         String password = loginData.get("password");
 
-        ResponseEntity<String> response = farmerService.authenticateFarmer(nic, password);
+        ResponseEntity<?> response = farmerService.authenticateFarmer(nic, password);
         return response;
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<Farmer> getProfile(@RequestAttribute(value = "authNic", required = true) String authNic) {
+        Farmer farmer = farmerService.findByNic(authNic);
+        if (farmer != null) {
+            return ResponseEntity.ok(farmer);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/{nic}")
-    public ResponseEntity<Farmer> getFarmerByNic(@PathVariable String nic) {
-        Farmer farmer = farmerService.findByNic(nic);
+    public ResponseEntity<Farmer> getFarmerByNic(@PathVariable String nic,
+                                                 @RequestAttribute(value = "authNic", required = false) String authNic,
+                                                 @RequestAttribute(value = "authRole", required = false) String authRole) {
+        String resolvedNic = ("farmer".equals(authRole) && authNic != null) ? authNic : nic;
+        Farmer farmer = farmerService.findByNic(resolvedNic);
 
         if (farmer != null) {
             return ResponseEntity.ok(farmer);
@@ -50,23 +63,29 @@ public class FarmerController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestBody Map<String, String> deleteData) {
-        String nic = deleteData.get("nic");
+    public ResponseEntity<String> delete(@RequestBody Map<String, String> deleteData,
+                                         @RequestAttribute(value = "authNic", required = false) String authNic) {
+        String nic = authNic != null ? authNic : deleteData.get("nic");
         String password = deleteData.get("password");
         return farmerService.deleteFarmer(nic, password);
     }
 
     @PutMapping("/changePassword")
-    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> data) {
-        String nic = data.get("nic");
+    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> data,
+                                                 @RequestAttribute(value = "authNic", required = false) String authNic) {
+        String nic = authNic != null ? authNic : data.get("nic");
         String currentPassword = data.get("currentPassword");
         String newPassword = data.get("newPassword");
         return farmerService.changePassword(nic, currentPassword, newPassword);
     }
 
     @PutMapping("/updateProfile/{nic}")
-    public ResponseEntity<Farmer> updateProfile(@PathVariable String nic, @RequestBody Farmer updatedFields) {
-        return farmerService.updateProfile(nic, updatedFields);
+    public ResponseEntity<Farmer> updateProfile(@PathVariable String nic,
+                                                @RequestBody Farmer updatedFields,
+                                                @RequestAttribute(value = "authNic", required = false) String authNic,
+                                                @RequestAttribute(value = "authRole", required = false) String authRole) {
+        String resolvedNic = "farmer".equals(authRole) && authNic != null ? authNic : nic;
+        return farmerService.updateProfile(resolvedNic, updatedFields);
     }
 
 }

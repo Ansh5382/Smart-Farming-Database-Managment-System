@@ -1,11 +1,25 @@
 // Home.jsx
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import AppHeader from "../components/owner/AppHeader.jsx";
 import SideNav from "../components/owner/SideNav.jsx";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
+import { useNic } from "../components/NicContext.jsx";
 
 const OwnerLayout = () => {
+    const { isAuthenticated, role, isLoading } = useNic();
+
+    if (isLoading) {
+        return (
+            <Box sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (!isAuthenticated || role !== 'owner') {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <>

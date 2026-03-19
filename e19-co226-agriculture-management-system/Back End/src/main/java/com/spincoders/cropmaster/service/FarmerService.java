@@ -12,7 +12,7 @@ public interface FarmerService {
 
     public List<Farmer> getAllFarmers();
 
-    public ResponseEntity<String> authenticateFarmer(String nic, String password);
+    public ResponseEntity<?> authenticateFarmer(String nic, String password);
 
     public Farmer findByNic(String nic);
 

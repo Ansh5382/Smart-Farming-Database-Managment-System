@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, Fab, Tooltip, Dialog, DialogTitle, DialogContent, Typography, IconButton, List, ListItem, ListItemText, Chip } from '@mui/material';
 import { Mic, MicOff, VolumeUp, Close, NavigateNext, Home, Person, Settings, Description, AgriculturalEstate } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useNic } from './NicContext.jsx';
 
 const VoiceAssistant = ({ role }) => {
     const [isListening, setIsListening] = useState(false);
@@ -11,6 +12,7 @@ const VoiceAssistant = ({ role }) => {
     const [error, setError] = useState('');
     const recognitionRef = useRef(null);
     const navigate = useNavigate();
+    const { clearNic } = useNic();
 
     useEffect(() => {
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -86,7 +88,7 @@ const VoiceAssistant = ({ role }) => {
             navigate('/update-soil');
         } else if (command.includes('logout') || command.includes('sign out')) {
             speak('Logging out');
-            localStorage.clear();
+            clearNic();
             navigate('/');
         } else {
             speak('Command not recognized. Try saying home, profile, settings, or reports.');

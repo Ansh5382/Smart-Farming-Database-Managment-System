@@ -26,17 +26,30 @@ public class OwnerController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Map<String, String> loginData) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
         String nic = loginData.get("nic");
         String password = loginData.get("password");
 
-        ResponseEntity<String> response = ownerService.authenticateOwner(nic, password);
+        ResponseEntity<?> response = ownerService.authenticateOwner(nic, password);
         return response;
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<Owner> getProfile(@RequestAttribute(value = "authNic", required = true) String authNic) {
+        Owner owner = ownerService.findByNic(authNic);
+        if (owner != null) {
+            return ResponseEntity.ok(owner);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/{nic}")
-    public ResponseEntity<Owner> getFarmerByNic(@PathVariable String nic) {
-        Owner owner = ownerService.findByNic(nic);
+    public ResponseEntity<Owner> getOwnerByNic(@PathVariable String nic,
+                                                @RequestAttribute(value = "authNic", required = false) String authNic,
+                                                @RequestAttribute(value = "authRole", required = false) String authRole) {
+        String resolvedNic = ("owner".equals(authRole) && authNic != null) ? authNic : nic;
+        Owner owner = ownerService.findByNic(resolvedNic);
 
         if (owner != null) {
             return ResponseEntity.ok(owner);
@@ -46,23 +59,29 @@ public class OwnerController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> delete(@RequestBody Map<String, String> deleteData) {
-        String nic = deleteData.get("nic");
+    public ResponseEntity<String> delete(@RequestBody Map<String, String> deleteData,
+                                         @RequestAttribute(value = "authNic", required = false) String authNic) {
+        String nic = authNic != null ? authNic : deleteData.get("nic");
         String password = deleteData.get("password");
         return ownerService.deleteOwner(nic, password);
     }
 
     @PutMapping("/changePassword")
-    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> data) {
-        String nic = data.get("nic");
+    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> data,
+                                                 @RequestAttribute(value = "authNic", required = false) String authNic) {
+        String nic = authNic != null ? authNic : data.get("nic");
         String currentPassword = data.get("currentPassword");
         String newPassword = data.get("newPassword");
         return ownerService.changePassword(nic, currentPassword, newPassword);
     }
 
     @PutMapping("/updateProfile/{nic}")
-    public ResponseEntity<Owner> updateProfile(@PathVariable String nic, @RequestBody Owner updatedFields) {
-        return ownerService.updateProfile(nic, updatedFields);
+    public ResponseEntity<Owner> updateProfile(@PathVariable String nic,
+                                               @RequestBody Owner updatedFields,
+                                               @RequestAttribute(value = "authNic", required = false) String authNic,
+                                               @RequestAttribute(value = "authRole", required = false) String authRole) {
+        String resolvedNic = "owner".equals(authRole) && authNic != null ? authNic : nic;
+        return ownerService.updateProfile(resolvedNic, updatedFields);
     }
 
 }

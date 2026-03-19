@@ -1,13 +1,25 @@
 // Home.jsx
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import AppHeader from "../components/farmer/AppHeader.jsx";
 import SideNav from "../components/farmer/SideNav.jsx";
-import {Outlet} from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import {useNic} from "../components/NicContext.jsx";
 
 const FarmerLayout = () => {
-    const { nic } = useNic(); // Get the nic value from context
+    const { nic, isAuthenticated, role, isLoading } = useNic();
+
+    if (isLoading) {
+        return (
+            <Box sx={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (!isAuthenticated || role !== 'farmer') {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <>
