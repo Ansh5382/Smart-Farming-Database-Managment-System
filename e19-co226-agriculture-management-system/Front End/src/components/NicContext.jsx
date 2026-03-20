@@ -3,10 +3,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 const NicContext = createContext();
 
 const STORAGE_KEYS = {
-    token: 'cropmasterToken',
+    nic: 'cropmasterNic',
+    role: 'cropmasterRole',
 };
-
-const API_BASE_URL = 'http://localhost:8080';
 
 export function useNic() {
     return useContext(NicContext);
@@ -14,120 +13,43 @@ export function useNic() {
 
 export function NicProvider({ children }) {
     const [authState, setAuthState] = useState({
-        nic: '',
-        role: '',
-        token: localStorage.getItem(STORAGE_KEYS.token) || '',
-        isLoading: true,
+        nic: localStorage.getItem(STORAGE_KEYS.nic) || '',
+        role: localStorage.getItem(STORAGE_KEYS.role) || '',
+        isLoading: false,
     });
 
-    // Handle token persistence
+    // Persist simple NIC-based session locally.
     useEffect(() => {
-        if (authState.token) {
-            localStorage.setItem(STORAGE_KEYS.token, authState.token);
+        if (authState.nic) {
+            localStorage.setItem(STORAGE_KEYS.nic, authState.nic);
         } else {
-            localStorage.removeItem(STORAGE_KEYS.token);
+            localStorage.removeItem(STORAGE_KEYS.nic);
         }
-    }, [authState.token]);
 
-    // Fetch profile if token exists
-    useEffect(() => {
-        const fetchProfile = async () => {
-            if (!authState.token) {
-                setAuthState(prev => ({ ...prev, nic: '', role: '', isLoading: false }));
-                return;
-            }
-
-            try {
-                // Try farmer profile first
-                let response = await fetch(`${API_BASE_URL}/farmer/profile`);
-                let data;
-                
-                if (response.ok) {
-                    data = await response.json();
-                    setAuthState(prev => ({ ...prev, nic: data.nic, role: 'farmer', isLoading: false }));
-                    return;
-                }
-
-                // Try owner profile if farmer failed
-                response = await fetch(`${API_BASE_URL}/owner/profile`);
-                if (response.ok) {
-                    data = await response.json();
-                    setAuthState(prev => ({ ...prev, nic: data.nic, role: 'owner', isLoading: false }));
-                    return;
-                }
-
-                // If both fail, token is likely invalid
-                setAuthState({ nic: '', role: '', token: '', isLoading: false });
-            } catch (error) {
-                console.error('Failed to fetch profile:', error);
-                setAuthState(prev => ({ ...prev, isLoading: false }));
-            }
-        };
-
-        fetchProfile();
-    }, [authState.token]);
-
-    useEffect(() => {
-        const originalFetch = window.fetch.bind(window);
-
-        window.fetch = async (input, init = {}) => {
-            const requestUrl = typeof input === 'string' ? input : input?.url || '';
-            const isBackendRequest = requestUrl.startsWith(API_BASE_URL);
-
-            if (!isBackendRequest || !authState.token) {
-                return originalFetch(input, init);
-            }
-
-            const headers = new Headers(
-                init.headers || (input instanceof Request ? input.headers : undefined)
-            );
-            
-            // Add Authorization header if not present
-            if (!headers.has('Authorization')) {
-                headers.set('Authorization', `Bearer ${authState.token}`);
-            }
-
-            const response = input instanceof Request
-                ? await originalFetch(new Request(input, { headers }))
-                : await originalFetch(input, { ...init, headers });
-
-            if (response.status === 401) {
-                // Only clear if it's not a login attempt
-                if (!requestUrl.includes('/login')) {
-                    setAuthState({ nic: '', role: '', token: '', isLoading: false });
-                    if (window.location.pathname !== '/') {
-                        window.location.assign('/');
-                    }
-                }
-            }
-
-            return response;
-        };
-
-        return () => {
-            window.fetch = originalFetch;
-        };
-    }, [authState.token]);
+        if (authState.role) {
+            localStorage.setItem(STORAGE_KEYS.role, authState.role);
+        } else {
+            localStorage.removeItem(STORAGE_KEYS.role);
+        }
+    }, [authState.nic, authState.role]);
 
     const setSession = (session) => {
         setAuthState({
             nic: session?.nic || '',
             role: session?.role || '',
-            token: session?.token || '',
             isLoading: false,
         });
     };
 
     const clearNic = () => {
-        setAuthState({ nic: '', role: '', token: '', isLoading: false });
+        setAuthState({ nic: '', role: '', isLoading: false });
     };
 
     const value = useMemo(() => ({
         nic: authState.nic,
         role: authState.role,
-        token: authState.token,
         isLoading: authState.isLoading,
-        isAuthenticated: Boolean(authState.token && authState.nic),
+        isAuthenticated: Boolean(authState.nic && authState.role),
         setSession,
         clearNic,
     }), [authState]);

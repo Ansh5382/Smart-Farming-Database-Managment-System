@@ -53,42 +53,67 @@ const FarmerHome = () => {
     const [loading, setLoading] = useState(false);
     const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
 
+    const fetchJsonSafe = async (url) => {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                return { ok: false, status: response.status, data: null, networkError: false };
+            }
+            return { ok: true, status: response.status, data: await response.json(), networkError: false };
+        } catch (error) {
+            return { ok: false, status: 0, data: null, networkError: true, error };
+        }
+    };
+
     // --- Data Fetching ---
     const fetchData = async () => {
         if (!nic) return;
         setLoading(true);
         try {
-            // Fetch farmer's profile to get their ownerNIC
-            const resProfile = await fetch(`http://localhost:8080/farmer/${nic}`);
-            if (!resProfile.ok) throw new Error("Could not fetch profile");
-            const profile = await resProfile.json();
-            
-            const ownerNIC = profile?.ownerNIC;
-            if (!ownerNIC) {
-                console.warn("Farmer has no associated ownerNIC");
+            const encodedNic = encodeURIComponent(nic);
+
+            // Fetch independent dashboard resources without failing the whole screen on one endpoint.
+            const [cropsResult, profileResult] = await Promise.all([
+                fetchJsonSafe(`http://localhost:8080/crop/byFarmer/${encodedNic}`),
+                fetchJsonSafe(`http://localhost:8080/farmer/${encodedNic}`)
+            ]);
+
+            if (cropsResult.ok) {
+                setCrops(cropsResult.data);
+            } else {
+                setCrops([]);
+            }
+
+            if (!profileResult.ok) {
                 setcropedFarmland([]);
                 setuncropedFarmland([]);
-                // Still fetch crops as they are registered by farmer
-                const resCrops = await fetch(`http://localhost:8080/crop/byFarmer/${nic}`);
-                if (resCrops.ok) setCrops(await resCrops.json());
-                setLoading(false);
+                if (profileResult.networkError && cropsResult.networkError) {
+                    console.warn("Farmer dashboard data unavailable: backend unreachable");
+                }
                 return;
             }
 
-            const [res1, res2, res3] = await Promise.all([
-                fetch(`http://localhost:8080/farmland/croped/${nic}/${ownerNIC}`),
-                fetch(`http://localhost:8080/farmland/uncroped/${nic}/${ownerNIC}`),
-                fetch(`http://localhost:8080/crop/byFarmer/${nic}`)
+            const profile = profileResult.data;
+            const ownerNIC = profile?.ownerNIC;
+            if (!ownerNIC) {
+                setcropedFarmland([]);
+                setuncropedFarmland([]);
+                return;
+            }
+
+            const encodedOwnerNIC = encodeURIComponent(ownerNIC);
+            const [cropedResult, uncropedResult] = await Promise.all([
+                fetchJsonSafe(`http://localhost:8080/farmland/croped/${encodedNic}/${encodedOwnerNIC}`),
+                fetchJsonSafe(`http://localhost:8080/farmland/uncroped/${encodedNic}/${encodedOwnerNIC}`)
             ]);
-            
-            if (res1.ok) setcropedFarmland(await res1.json());
-            if (res2.ok) setuncropedFarmland(await res2.json());
-            if (res3.ok) setCrops(await res3.json());
+
+            setcropedFarmland(cropedResult.ok ? cropedResult.data : []);
+            setuncropedFarmland(uncropedResult.ok ? uncropedResult.data : []);
         } catch (error) {
             console.error("Fetch error:", error);
-            showNotify("Could not connect to server", "error");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => {

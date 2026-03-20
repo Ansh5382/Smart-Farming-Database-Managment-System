@@ -39,8 +39,8 @@ public class FarmerController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<Farmer> getProfile(@RequestAttribute(value = "authNic", required = true) String authNic) {
-        Farmer farmer = farmerService.findByNic(authNic);
+    public ResponseEntity<Farmer> getProfile(@RequestParam("nic") String nic) {
+        Farmer farmer = farmerService.findByNic(nic);
         if (farmer != null) {
             return ResponseEntity.ok(farmer);
         } else {

@@ -35,8 +35,8 @@ public class OwnerController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<Owner> getProfile(@RequestAttribute(value = "authNic", required = true) String authNic) {
-        Owner owner = ownerService.findByNic(authNic);
+    public ResponseEntity<Owner> getProfile(@RequestParam("nic") String nic) {
+        Owner owner = ownerService.findByNic(nic);
         if (owner != null) {
             return ResponseEntity.ok(owner);
         } else {

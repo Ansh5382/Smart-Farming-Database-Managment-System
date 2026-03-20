@@ -1,6 +1,5 @@
 package com.spincoders.cropmaster.service;
 
-import com.spincoders.cropmaster.auth.JwtService;
 import com.spincoders.cropmaster.dto.LoginResponse;
 import com.spincoders.cropmaster.model.Owner;
 import com.spincoders.cropmaster.repositary.OwnerRepositary;
@@ -25,9 +24,6 @@ public class OwnerImplementation implements OwnerService {
     @Autowired
     private FarmLandRepositary farmLandRepositary;
 
-    @Autowired
-    private JwtService jwtService;
-
     @Override
     public Owner saveOwner(Owner owner) {
         // Hash the password before saving
@@ -45,8 +41,7 @@ public class OwnerImplementation implements OwnerService {
         }
 
         if (BCrypt.checkpw(password, owner.getPassword())) {
-            String token = jwtService.generateToken(nic, "owner");
-            return ResponseEntity.ok(new LoginResponse("Login successful", token, nic, "owner"));
+            return ResponseEntity.ok(new LoginResponse("Login successful", "", nic, "owner"));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"Wrong password\"}");
         }
