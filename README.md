@@ -174,7 +174,6 @@ The backend provides comprehensive REST APIs for:
 
 ## 🔮 Roadmap & Future Enhancements
 
-- ✅ Token-based JWT Authentication
 - ✅ Swagger/OpenAPI Documentation
 - ✅ Environment Variables (.env configuration)
 - ✅ Advanced Data Validation
